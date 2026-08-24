@@ -1,0 +1,9 @@
+# Claude Code — settings locaux (permissions machine-spécifiques)
+.claude/settings.local.json
+
+# Node.js
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
