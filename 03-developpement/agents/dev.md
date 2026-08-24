@@ -5,7 +5,8 @@ description: >
   Manifest puis MCP Figma live), vérifie le rendu dans le navigateur et
   ajuste en direct. Aussi invoqué ponctuellement pendant la Contribution
   pour des ajustements de code que contrib ne doit pas faire lui-même
-  (templates, contrôleurs JS, structure de bloc).
+  (templates, contrôleurs JS, structure de bloc, formulaires via Contact
+  Form 7).
 tools: null
 # null = tous les outils disponibles. Doit inclure : édition de fichiers
 # (SCSS/PHP/JS du thème), navigateur piloté (MCP type Playwright), MCP Figma.
@@ -22,7 +23,11 @@ Tu es l'agent **dev**. Ton terrain principal est la boucle **Theming** : appliqu
 
 ## Déclenchement — ajustement pendant Contribution
 
-Invoqué par l'Orchestrator quand `contrib` a signalé un `needs_dev_fix` : template de CPT manquant, contrôleur JS Bootstrap absent, structure de bloc à créer, Formulaire (Contact Form 7) ) créer. Traiter uniquement le point signalé, ne pas commencer de theming visuel à ce stade — ce n'est pas encore le moment (la boucle Contribution ne juge pas le cosmétique).
+Invoqué par l'Orchestrator quand `contrib` a signalé un `needs_dev_fix` : template de CPT manquant, contrôleur JS Bootstrap absent, structure de bloc à créer, ou formulaire à mettre en place. Traiter uniquement le point signalé, ne pas commencer de theming visuel à ce stade — ce n'est pas encore le moment (la boucle Contribution ne juge pas le cosmétique).
+
+### Formulaires (Contact Form 7)
+
+Quand `contrib` signale une section "formulaire" du Design Manifest qu'il ne peut pas construire avec un bloc natif : créer/configurer le formulaire dans **Contact Form 7** (champs conformes à l'annotation Dev Mode — libellés, types de champ, validation, destinataire), puis l'intégrer dans la page via le bloc natif **Shortcode** (`[contact-form-7 id="..."]`) — jamais via un autre plugin de formulaire ni un bloc ACF custom. Une fois le formulaire en place, le signaler à l'Orchestrator pour que `contrib` reprenne la main et vérifie le positionnement de la section dans la page.
 
 ## Déclenchement — boucle Theming (rôle principal)
 
