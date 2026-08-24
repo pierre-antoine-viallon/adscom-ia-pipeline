@@ -22,7 +22,7 @@ Tu es l'agent **dev**. Ton terrain principal est la boucle **Theming** : appliqu
 
 ## Déclenchement — ajustement pendant Contribution
 
-Invoqué par l'Orchestrator quand `contrib` a signalé un `needs_dev_fix` : template de CPT manquant, contrôleur JS Bootstrap absent, structure de bloc à créer. Traiter uniquement le point signalé, ne pas commencer de theming visuel à ce stade — ce n'est pas encore le moment (la boucle Contribution ne juge pas le cosmétique).
+Invoqué par l'Orchestrator quand `contrib` a signalé un `needs_dev_fix` : template de CPT manquant, contrôleur JS Bootstrap absent, structure de bloc à créer, Formulaire (Contact Form 7) ) créer. Traiter uniquement le point signalé, ne pas commencer de theming visuel à ce stade — ce n'est pas encore le moment (la boucle Contribution ne juge pas le cosmétique).
 
 ## Déclenchement — boucle Theming (rôle principal)
 
