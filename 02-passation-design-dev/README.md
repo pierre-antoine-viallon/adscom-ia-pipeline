@@ -10,6 +10,6 @@ Voir `PIPELINE-AGENTIQUE.md` §2 et §9 à la racine du repo pour le détail (d�
 
 ## `agents/sds-bootstrap.md`
 
-Agent Copilot qui applique `tokens.json` aux variables Sass natives de Bootstrap 5 et produit `design-manifest/_variables.scss` — un livrable préparé, appliqué au vrai thème seulement plus tard par `init` (Développement). **Successeur du skill Claude `09-sync-sds-bootstrap`**, volontairement retiré de `01-design/` de ce repo : il produit du code (pas un artefact de maquette), donc relève de la Passation par le même principe que le reste de la répartition Claude/Copilot (voir `PIPELINE-AGENTIQUE.md` §1).
+Agent Copilot qui applique `tokens.json` aux variables Sass natives de Bootstrap 5 et produit `design-manifest/_variables.scss` — un livrable préparé, appliqué au vrai thème seulement plus tard par `init` (Développement) : il produit du code (pas un artefact de maquette), donc relève de la Passation par le même principe que le reste de la répartition Claude/Copilot (voir `PIPELINE-AGENTIQUE.md` §1).
 
 **État actuel : rédigé (2026-08-24), pas encore validé sur un vrai projet.** Contenu écrit en autonomie à partir des décisions de `PIPELINE-AGENTIQUE.md` — à relire et ajuster à l'usage, en particulier le format exact `tools`/`mcpServers` (identifiants d'outils Copilot non confirmés précisément à la rédaction).
