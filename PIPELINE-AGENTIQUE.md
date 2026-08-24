@@ -75,10 +75,10 @@ Les deux boucles (`Contrib ↔ Reviewer`, `Theming ↔ Reviewer`) sont gérées 
 Trois natures de données, trois sources différentes :
 
 1. **Valeurs de tokens** (couleurs, typo, spacing/radius) : toujours depuis `tokens.json` figé (généré par l'agent `spec`, Passation), jamais re-dérivées ni par MCP live ni par lecture visuelle d'un PNG pendant la boucle.
-2. **Fidélité structurelle/visuelle** (bloc présent, ordre, responsive) :
-   - **Itération 1** de chaque boucle : Design Manifest (PNG + `layout_order` figés) — rapide, gratuit, résistant à une panne de quota MCP.
-   - **Itérations suivantes** (verdict `DEV_FIX`/`CONTRIB_FIX`) : bascule sur **MCP Figma live** pour un diagnostic plus précis.
-3. **Épuisement du quota MCP en cours de boucle** : traité comme un déclencheur d'escalade humaine explicite — jamais un repli silencieux vers le PNG.
+2. **Fidélité structurelle/visuelle** (bloc présent, ordre, responsive) : **MCP Figma live**, dès l'itération 1 — c'est la source principale. Le Design Manifest (PNG + `layout_order` figés) ne suffit pas seul pour un theming fidèle (pas assez de détail exploitable : espacements exacts, valeurs précises, hiérarchie fine) ; il reste consulté comme repère visuel rapide en complément, jamais comme substitut au MCP.
+3. **Épuisement du quota MCP en cours de boucle** : traité comme un déclencheur d'escalade humaine explicite — jamais un repli silencieux vers le PNG. Risque accru par rapport à la version précédente de cette section (le MCP est maintenant sollicité dès la première itération de chaque unité, plus seulement en cas de rejet) : accepté comme compromis délibéré, la fidélité prime sur l'économie de quota.
+
+**Révision (2026-08-24)** : la répartition PNG-d'abord/MCP-en-second-recours a été abandonnée — un PNG seul a été jugé insuffisant pour que `dev` applique un theming fidèle (pas de valeurs exactes, pas de détail fin exploitable). Le MCP Figma live devient la source principale dès l'itération 1 dans `dev.md` et `reviewer.md` ; le PNG reste un repère visuel rapide, jamais la source de comparaison faisant foi.
 
 Le pilotage navigateur (vérification visuelle, responsive, RGAA) côté Copilot s'appuie sur un serveur MCP de type Playwright (arbre d'accessibilité natif, émulation d'appareil, screenshots) — capacité confirmée équivalente à l'outillage navigateur utilisé côté Claude.
 

@@ -11,11 +11,12 @@ tools: null
 # null = tous les outils disponibles. Doit inclure : navigateur (MCP type
 # Playwright — arbre d'accessibilité, émulation d'appareil, screenshots),
 # lecture fichiers (design-manifest/, tokens.json). MCP Figma nécessaire
-# uniquement à partir de l'itération 2 (voir "Source de vérité" ci-dessous)
-# — pas d'écriture nulle part, cet agent ne fait que constater.
+# dès l'itération 1 (voir "Source de vérité" ci-dessous) — source
+# principale pour juger la fidélité structurelle/visuelle, pas d'écriture
+# nulle part, cet agent ne fait que constater.
 mcpServers:
   figma:
-    description: "Lecture seule, utilisée seulement à partir de l'itération 2 d'une même unité (diagnostic plus précis qu'un simple PNG)."
+    description: "Lecture seule, consultée dès l'itération 1 comme source principale de comparaison — plus précise qu'un simple PNG."
   browser:
     description: "Navigateur piloté (type Playwright MCP) pour la vérification visuelle, responsive et l'arbre d'accessibilité."
 ---
@@ -40,10 +41,9 @@ Vérifie, sur le bloc ciblé :
 
 ## Source de vérité (Theming uniquement)
 
-- **Itération 1** de l'unité : comparer le rendu au **Design Manifest** — screenshot PNG figé + champ `layout_order`. Rapide, ne dépend pas du quota MCP Figma.
-- **Itérations suivantes** (le verdict précédent était `DEV_FIX` ou `CONTRIB_FIX`) : basculer sur le **MCP Figma live** pour un diagnostic plus précis que le PNG.
+- **Fidélité structurelle/visuelle** : comparer le rendu au **MCP Figma live**, dès l'itération 1 — c'est la source principale. Le **Design Manifest** (screenshot PNG figé + champ `layout_order`) ne donne pas assez de détail (espacements exacts, valeurs précises) pour juger une conformité fine ; il reste un repère visuel rapide en complément, jamais un substitut au MCP.
 - **Valeurs de tokens** (couleurs, typo, spacing) : ne jamais les ré-estimer visuellement ni par MCP — toujours comparer contre `design-manifest/tokens.json`, qui est la seule source fiable pour ça.
-- Si le quota MCP Figma est épuisé en cours de boucle : ne pas replier silencieusement sur le PNG en te comportant comme si de rien n'était — le signaler explicitement dans ton rapport, l'Orchestrator décide alors d'escalader.
+- Si le quota MCP Figma est épuisé en cours de boucle, à quelque itération que ce soit : ne pas replier silencieusement sur le PNG en te comportant comme si de rien n'était — le signaler explicitement dans ton rapport, l'Orchestrator décide alors d'escalader.
 
 ## Comportement
 

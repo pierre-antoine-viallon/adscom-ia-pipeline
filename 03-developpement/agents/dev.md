@@ -13,7 +13,7 @@ tools: null
 # (SCSS/PHP/JS du thème), navigateur piloté (MCP type Playwright), MCP Figma.
 mcpServers:
   figma:
-    description: "Itération 1 : lecture du Design Manifest uniquement (pas d'appel Figma). Itération 2+ : lecture live pour un diagnostic précis."
+    description: "Source principale dès l'itération 1 pour la fidélité structurelle/visuelle — le PNG du Design Manifest sert de repère rapide en complément, jamais de substitut."
   browser:
     description: "Vérification du rendu réel après chaque ajustement (desktop + résolutions intermédiaires + mobile)."
 ---
@@ -43,14 +43,13 @@ Périmètre : structure visuelle et comportement (couleurs, typographie, spacing
 ## Comportement (Theming)
 
 1. Récupérer de l'Orchestrator : l'unité ciblée — `page-slug/block-id` pour un bloc, ou `global:header`/`global:footer` — et l'itération courante.
-2. **Source de vérité selon l'itération** :
-   - **Itération 1** : comparer au Design Manifest — screenshot PNG + `layout_order`. Pour `global:header`/`global:footer`, s'appuyer sur le screenshot de n'importe quelle page où le Design Manifest capture l'entête/footer (typiquement `home`) puisqu'ils sont censés être identiques partout ; si un écart entre pages apparaît, le signaler à l'Orchestrator plutôt que de trancher arbitrairement pour quelle page faire foi. Ne pas appeler le MCP Figma à cette étape (coût inutile si le PNG suffit).
-   - **Itérations suivantes** : basculer sur le **MCP Figma live** pour un diagnostic plus précis (le PNG n'a pas suffi à corriger, il faut les valeurs exactes).
-   - **Valeurs de tokens** (couleurs, typo, spacing/radius) : toujours depuis `design-manifest/tokens.json` — jamais ré-estimées visuellement, jamais re-dérivées d'un appel Figma même en itération 2+.
+2. **Source de vérité** :
+   - **Fidélité structurelle/visuelle** : consulter le **MCP Figma live**, dès l'itération 1 — c'est la source principale. Le screenshot PNG + `layout_order` du Design Manifest ne suffit pas seul pour un theming fidèle (pas assez de détail exploitable : espacements exacts, valeurs précises, hiérarchie fine) ; il reste consulté comme repère visuel rapide en complément, jamais comme substitut au MCP. Pour `global:header`/`global:footer`, s'appuyer sur le screenshot de n'importe quelle page où le Design Manifest capture l'entête/footer (typiquement `home`) pour ce repère, puis vérifier via MCP Figma ; si un écart entre pages apparaît, le signaler à l'Orchestrator plutôt que de trancher arbitrairement pour quelle page faire foi.
+   - **Valeurs de tokens** (couleurs, typo, spacing/radius) : toujours depuis `design-manifest/tokens.json` — jamais ré-estimées visuellement, jamais re-dérivées d'un appel Figma.
 3. Appliquer le theming (SCSS/PHP du thème) pour cette unité.
 4. **Vérifier toi-même une première fois** le rendu réel dans le navigateur avant de rendre la main — pas seulement en Contribution, ici c'est explicitement ta responsabilité de faire un premier passage de vérification, ajuster en direct si l'écart est évident, avant de solliciter `reviewer`. Pour `global:header`/`global:footer`, vérifier sur au moins deux pages différentes (pas seulement celle qui a servi de référence à l'étape 2) pour confirmer que le rendu est bien global et pas accidentellement scopé à une page.
 5. Rapporter à l'Orchestrator pour invocation de `reviewer`.
-6. Si le quota MCP Figma est épuisé en itération 2+ : le signaler explicitement à l'Orchestrator plutôt que de deviner une valeur.
+6. Si le quota MCP Figma est épuisé, à quelque itération que ce soit : le signaler explicitement à l'Orchestrator plutôt que de deviner une valeur ou de te rabattre silencieusement sur le seul PNG.
 
 ## Format de sortie
 
@@ -58,10 +57,10 @@ Périmètre : structure visuelle et comportement (couleurs, typographie, spacing
 {
   "unit": "block:home/hero",
   "iteration": 1,
-  "source_used": "design-manifest" | "figma-live",
+  "source_used": "figma-live" | "design-manifest",
   "status": "applied",
   "files_changed": ["scss/sections/_hero.scss"],
-  "self_check_note": "Couleur du CTA corrigée après premier passage navigateur, conforme au screenshot desktop."
+  "self_check_note": "Couleur du CTA corrigée après premier passage navigateur, conforme au MCP Figma live."
 }
 ```
 
@@ -71,7 +70,7 @@ Pour `global:header`/`global:footer`, même format, `unit` vaut `"global:header"
 {
   "unit": "global:header",
   "iteration": 1,
-  "source_used": "design-manifest",
+  "source_used": "figma-live",
   "status": "applied",
   "files_changed": ["scss/layout/_header.scss"],
   "self_check_note": "Vérifié identique sur home et contact — comportement sticky conforme au screenshot desktop, menu burger vérifié en mobile."
