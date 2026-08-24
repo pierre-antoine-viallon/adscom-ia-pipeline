@@ -12,4 +12,4 @@ Init → Contribution → Theming, piloté par l'Orchestrator (agent Copilot, ro
 | `reviewer.md` | Vérifie la conformité (Contribution : cohérence/zoning ; Theming : fidélité maquette, responsive, RGAA, perf) — verdict classé `APPROVED`/`DEV_FIX`/`CONTRIB_FIX`/`HUMAN_REVIEW` |
 | `dev.md` | Theming bloc par bloc en itération avec la maquette (MCP Figma) |
 
-**État actuel : tous en stub, contenu comportemental (prompt système, `tools`, `mcpServers`) pas encore rédigé.**
+**État actuel : rédigé (2026-08-24), pas encore validé sur un vrai projet.** Décision prise en autonomie pendant la rédaction : `reviewer` est **un seul agent à deux modes** (Contribution/Theming, checklist choisie selon la phase transmise par l'Orchestrator) plutôt que deux agents séparés — à confirmer ou revoir à l'usage. Format exact `tools`/`mcpServers` à ajuster (identifiants d'outils Copilot non confirmés précisément à la rédaction).

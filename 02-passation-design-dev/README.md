@@ -8,4 +8,4 @@ Agent Copilot qui génère le **Design Manifest** : artefact structuré (`index.
 
 Voir `PIPELINE-AGENTIQUE.md` §2 et §9 à la racine du repo pour le détail (décision Option A write-once, séparation avec le journal d'exécution de l'Orchestrator).
 
-**État actuel : stub, contenu comportemental pas encore rédigé.**
+**État actuel : rédigé (2026-08-24), pas encore validé sur un vrai projet.** Première version écrite en autonomie à partir des décisions de `PIPELINE-AGENTIQUE.md` — à relire et ajuster à l'usage, en particulier le format exact `tools`/`mcpServers` (identifiants d'outils Copilot non confirmés précisément à la rédaction).

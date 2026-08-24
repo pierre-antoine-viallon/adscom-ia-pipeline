@@ -94,7 +94,7 @@ Toujours commencer par `/00-brief-onboarding` — `brief-projet.md` est lu par t
 
 ## Passation et Développement (`02-passation-design-dev/`, `03-developpement/`)
 
-Agents GitHub Copilot — voir `PIPELINE-AGENTIQUE.md` pour le rôle de chacun (IA Spec, Orchestrator, IA dev, IA Contrib, IA reviewer) et l'état d'avancement (stubs réservés, contenu comportemental pas encore rédigé).
+Agents GitHub Copilot — voir `PIPELINE-AGENTIQUE.md` pour le rôle de chacun (IA Spec, Orchestrator, IA dev, IA Contrib, IA reviewer). Contenu comportemental rédigé (2026-08-24), pas encore validé sur un vrai projet — voir les `README.md` de `02-passation-design-dev/` et `03-developpement/`.
 
 ---
 

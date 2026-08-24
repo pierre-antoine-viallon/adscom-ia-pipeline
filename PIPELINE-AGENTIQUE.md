@@ -152,7 +152,7 @@ Complément **mutable** (append-only) au Design Manifest **figé** (§2) — sé
 
 **Ancien repo `figma-mcp-claude-skills`** : laissé intact, aucune action dessus — il continue de servir tel quel les projets déjà en cours (RJAC, CC4V, Neoville, TPbCCI45), installés par clone/submodule direct comme avant. Ce repo-ci (`adscom-ia-pipeline`) est la source de vérité pour tout nouveau projet à partir de maintenant.
 
-**Ouvert** : un seul agent `reviewer` pour Contribution ET Theming (checklists différentes selon la phase, à faire porter par le prompt système) ou deux agents séparés — à trancher à l'implémentation. Contenu des 6 fichiers `agents/*.md` (prompt système, outils, serveurs MCP par agent) pas encore rédigé — stubs réservés uniquement à ce stade.
+**Tranché (2026-08-24)** : `reviewer` est un seul agent à deux modes (Contribution/Theming, checklist choisie selon la phase transmise par l'Orchestrator en tête de l'invocation) — pas deux agents séparés. Décision prise en autonomie pendant la rédaction du contenu comportemental complet des 6 fichiers `agents/*.md` (prompt système, journal d'exécution en `.orchestrator/journal.ndjson`, logique de routage détaillée dans `orchestrator.md`) — pas encore validé sur un vrai projet, en particulier le format exact des identifiants `tools`/`mcpServers` Copilot (structure plausible, pas vérifiée contre la doc officielle caractère pour caractère).
 
 ---
 

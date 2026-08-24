@@ -33,7 +33,7 @@ Tous lisent `brief-projet.md` à la racine du projet consommateur comme source d
 
 Fichier Markdown avec frontmatter YAML : `name`, `description` (utilisée pour la sélection automatique par l'agent parent), `prompt` (prompt système), `tools` (liste, `null`/omis = tous), `mcpServers` (serveurs MCP propres à cet agent). Contexte d'exécution isolé par agent — voir `PIPELINE-AGENTIQUE.md` §1 et §9 pour le rôle de chacun.
 
-**État actuel : les 6 fichiers sont des stubs.** Ne pas inventer de contenu comportemental (prompt système détaillé, restrictions d'outils précises) sans validation explicite — même règle que celle qui a retardé leur rédaction lors de la conception initiale.
+**État actuel (depuis le 2026-08-24) : les 6 fichiers ont un contenu comportemental complet**, rédigé en autonomie à partir des décisions de `PIPELINE-AGENTIQUE.md` — pas encore validé sur un vrai projet. Point ouvert non tranché à la rédaction : format exact des identifiants `tools`/`mcpServers` Copilot (structure plausible, pas vérifiée caractère pour caractère contre la doc officielle au moment de l'écriture) — à confirmer au premier usage réel plutôt qu'à supposer correct.
 
 ## Conventions de classification
 
