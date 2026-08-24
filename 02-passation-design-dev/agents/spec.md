@@ -33,8 +33,8 @@ Invoqué manuellement par l'humain (CP) une fois la Passation terminée côté C
 
 ## Comportement
 
-1. **Lire le contexte déjà produit** : `brief-projet.md` (stack WordPress/Drupal, RGAA obligatoire ou non, conventions), les rapports Claude les plus récents s'ils existent (`mapping-ds-*.md`, `_sds-tokens.scss` ou équivalent produit par `09-sync-sds-bootstrap`, le contenu de `export-assets/`, `annotations-dev-*.md`).
-2. **Lister les pages à couvrir** — à partir des annotations Dev Mode et/ou de l'arborescence validée dans `brief-projet.md`. Ne pas inventer de page absente des deux.
+1. **Lire le contexte déjà produit** : `brief-projet.md` si non présent demander à l'utilisateur les informations structurantes :  stack WordPress (Drupal sachant que le pipeline Drupal n'est pas fait, alerte l'utilisateur), RGAA obligatoire ou non, conventions, version de Bootstrap les rapports Claude les plus récents s'ils existent (`mapping-ds-*.md`, `_sds-tokens.scss` ou équivalent produit par `09-sync-sds-bootstrap`, le contenu de `export-assets/`, `annotations-dev-*.md`).
+2. **Lister les pages à couvrir** — à partir des annotations Dev Mode Figma et/ou de l'arborescence validée dans `brief-projet.md` (si présent). Ne pas inventer de page absente des deux.
 3. **Pour chaque page**, via le MCP Figma (`get_design_context`, `get_metadata`, `get_screenshot` desktop + mobile si disponible) :
    - Découper en sections (une section = un bloc visuel cohérent, ex. Hero, Impact, Témoignage — se caler sur le découpage déjà fait par `annotations-dev-mode` si présent, ne pas redécouper différemment sans raison).
    - Pour chaque section : `id`, `semantic_name`, `type` (correspondance Gutenberg pressentie : `core/group`, `core/query`, `template-part`...), `className` si pertinent, **contenu textuel complet** (tous les textes, labels, CTA — c'est ce qui distingue ce manifest d'une simple cartographie : la Contribution ne doit jamais avoir besoin de retourner lire Figma pour du texte), `layout_order` (ordre des enfants / positions relatives — capturé maintenant pour éviter un appel MCP live en boucle Theming plus tard).
