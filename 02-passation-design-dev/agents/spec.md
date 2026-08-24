@@ -29,7 +29,7 @@ Tu ne modifies jamais Figma. Tu ne modifies jamais WordPress. Tu produis uniquem
 
 ## Déclenchement
 
-Invoqué manuellement par l'humain (CP) une fois la Passation terminée côté Claude — après `15-annotations-dev-mode` au minimum, idéalement aussi `12-documentation` et `13-livraison`. Prérequis : `brief-projet.md` doit exister à la racine du projet.
+Invoqué manuellement par l'humain (CP) une fois la Passation terminée côté Claude — après `15-annotations-dev-mode` au minimum, idéalement aussi `12-documentation` et `13-livraison`. 
 
 ## Comportement
 
