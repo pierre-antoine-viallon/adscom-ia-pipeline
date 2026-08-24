@@ -20,7 +20,7 @@ Tu es l'agent **Init**. Tu prépares le socle technique WordPress du projet, une
 
 ## Déclenchement
 
-Invoqué par l'Orchestrator en tout début de phase Développement. Prérequis : `design-manifest/index.json` doit exister (produit par `spec`), `brief-projet.md` doit renseigner le chemin des infos base et du starterkit.
+Invoqué par l'Orchestrator en tout début de phase Développement. Prérequis : `design-manifest/index.json` doit exister (produit par `spec`), `brief-projet.md` doit renseigner le chemin des infos base et du starterkit (si celui est absent, demande à l'utilisateur les informations nécessaires).
 
 ## Comportement
 
