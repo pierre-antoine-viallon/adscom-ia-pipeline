@@ -8,7 +8,7 @@ Tu es un expert design system chez ads-COM. Quand ce skill est activé, tu analy
 - **Espacements et radius** : quels paddings/gaps/rayons ne sont pas liés aux collections `Size` (`Space/*`, `Radius/*`), et quelle variable existante leur correspond le mieux (Étape 7).
 - **Composants (boutons et assimilés)** : quels éléments répétés ressemblent à un composant SDS existant sans en être une instance, et lequel/laquelle leur correspond le mieux — ou l'absence de correspondance à signaler (Étape 8).
 
-Tu ne modifies **jamais** le fichier Figma directement — tu guides, le designer exécute via le skill `nettoyage-figma` (Opération B couleurs, D styles de texte, E espacements/radius, F composants), `sync-sds-bootstrap`, ou via un **prompt Figma AI personnalisé** que tu génères à partir de l'analyse (Étape 9) et que le designer colle lui-même dans Figma — utile quand `use_figma` n'est pas souhaitable (fichier en cours d'édition live, préférence du designer).
+Tu ne modifies **jamais** le fichier Figma directement — tu guides, le designer exécute via le skill `nettoyage-figma` (Opération B couleurs, D styles de texte, E espacements/radius, F composants), ou via un **prompt Figma AI personnalisé** que tu génères à partir de l'analyse (Étape 9) et que le designer colle lui-même dans Figma — utile quand `use_figma` n'est pas souhaitable (fichier en cours d'édition live, préférence du designer). La correspondance couleurs/typo vers Sass n'est plus automatisée par un skill Claude à ce stade — voir l'agent Copilot `sds-bootstrap` en Passation (`02-passation-design-dev/agents/sds-bootstrap.md`).
 
 **Règle commune à tous les volets : ne jamais proposer la création d'un nouveau token/style/composant.** Toujours rapprocher vers l'élément existant le plus proche (couleur, style de texte, variable `Size`, ou composant déjà défini dans le SDS), quitte à signaler un écart — ou une absence de correspondance — au designer plutôt que d'inventer une nouvelle valeur ou de forcer un mauvais matching.
 
@@ -626,7 +626,7 @@ Remplis ce gabarit avec les données réelles de l'analyse (Étapes 1 à 7) : un
 3. Lier les `<N>` occurrences de `#dee2e6` → `Border/default`
 4. …
 
-> Utiliser le skill `/sync-sds-bootstrap` pour automatiser cette phase.
+> Cette correspondance couleurs → Sass n'est plus automatisée par un skill Claude ici — elle est reprise en Passation par l'agent Copilot `sds-bootstrap` (`02-passation-design-dev/agents/sds-bootstrap.md`), à partir du `tokens.json` du Design Manifest.
 
 ### Phase 2 — Créer les primitifs manquants (🟠 moyenne priorité)
 *À faire avant de lier — le token cible doit exister.*
@@ -769,6 +769,6 @@ Remplis ce gabarit avec les données réelles de l'analyse (Étapes 1 à 7) : un
 - **Styles de texte** : ne jamais trancher seul un matching qui traverse les familles de police ou qui perd une propriété (`UPPER`/`UNDERLINE`/`ITALIC`) sans la signaler — remonter ces cas au designer avant liaison.
 - **Espacements/radius** : ne jamais forcer une valeur clairement hors échelle (marge structurelle) vers la variable la plus proche si l'écart dépasse ~50 % — la signaler plutôt que de risquer une régression visuelle. Toujours vérifier si un radius correspond à un cercle/pilule (≥ moitié de la plus petite dimension) avant de choisir une valeur numérique de l'échelle classique.
 - **Composants** : ne jamais forcer une instanciation si un élément requis par le composant (icône, slot) est absent du nœud brut, ou si les tailles sont trop différentes — signaler l'absence de correspondance plutôt que de dégrader visuellement l'élément. Ce skill ne crée jamais de nouveau composant — c'est le rôle de `/composants`.
-- Ce skill produit un **plan** — l'exécution est assurée par `/sync-sds-bootstrap` (couleurs, automatisé), `/nettoyage-figma` (Opération B couleurs, D styles de texte, E espacements/radius, F composants), par le designer manuellement, ou par un **prompt Figma AI personnalisé** (Étape 9) que le designer colle lui-même dans Figma.
+- Ce skill produit un **plan** — l'exécution du binding Figma est assurée par `/nettoyage-figma` (Opération B couleurs, D styles de texte, E espacements/radius, F composants), par le designer manuellement, ou par un **prompt Figma AI personnalisé** (Étape 9) que le designer colle lui-même dans Figma. La correspondance couleurs → Sass (côté code, pas côté Figma) est prise en charge séparément, en Passation, par l'agent Copilot `sds-bootstrap`.
 - **Prompt Figma AI (Étape 9)** : ne jamais le générer sans le garde-fou d'exclusion des composants partagés et la consigne "vérifie que ce n'est pas déjà lié" en Étape 0 — un incident réel (2026-07-22, projet Neocampus) a montré qu'une liaison par simple valeur hex affichée peut silencieusement casser des bindings corrects ailleurs dans le fichier, sans régression visuelle détectable.
 - Propose à la fin de sauvegarder le plan dans `mapping-ds-<date>.md`, ou le prompt généré dans `prompt-sds-<page>-<date>.md` si l'Étape 9 a été produite.

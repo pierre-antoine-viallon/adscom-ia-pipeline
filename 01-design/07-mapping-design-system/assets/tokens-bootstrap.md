@@ -106,7 +106,7 @@ Bootstrap ne stocke qu'**une seule variable par teinte** (`$blue`, `$red`, `$gre
 
 ### Échelle de tailles
 
-Le SDS Figma nomme ses tailles par intention (`Title Hero`, `Title Page`, `Heading`, `Subheading`, `Subtitle`, `Body`, `Code`), pas par niveau `h1`-`h6` — voir `09-sync-sds-bootstrap/SKILL.md` Étape 3 règle 7 pour la logique de mapping raisonné (à confirmer avec l'utilisateur, pas d'auto-mapping par ordre alphabétique/numérique).
+Le SDS Figma nomme ses tailles par intention (`Title Hero`, `Title Page`, `Heading`, `Subheading`, `Subtitle`, `Body`, `Code`), pas par niveau `h1`-`h6` — voir `02-passation-design-dev/agents/sds-bootstrap.md` (successeur de l'ancien skill Claude `09-sync-sds-bootstrap`, retiré de `01-design/` — même méthode de mapping raisonné, à confirmer avec l'utilisateur, pas d'auto-mapping par ordre alphabétique/numérique).
 
 | Token Bootstrap | Valeur défaut | Note |
 |---|---|---|

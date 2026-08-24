@@ -44,7 +44,9 @@ L'Orchestrator reste un **routeur déterministe** : séquence Init → Contribut
 
 **Décision actée (Option A)** : le Design Manifest produit par IA Spec est **write-once** — généré une fois, jamais retouché par les agents en aval. Respecte l'invariant déjà en place dans toute la bibliothèque Claude (un skill = un producteur, plusieurs consommateurs en lecture), étendu tel quel au monde Copilot. Une révision Figma en cours de Développement devient un événement explicite (nouvelle version versionnée du manifest, régénérée par IA Spec), jamais une mutation silencieuse.
 
-Contenu à couvrir par IA Spec (au-delà de ce que fait déjà `01-design/09-sync-sds-bootstrap` côté Claude pour les tokens, dont IA Spec lit la sortie comme un fichier de plus) : ajouter un champ `layout_order` par section pour capturer l'ordre des enfants/positions relatives — évite un appel MCP live en boucle de Theming pour ce genre de vérification (cas réel rencontré : réordonnancement d'une galerie, trouvé initialement seulement via `get_metadata`).
+**Révision (2026-08-24)** : `09-sync-sds-bootstrap` (Claude, `01-design/`) a été retiré de ce repo et remplacé par l'agent Copilot `sds-bootstrap` (`02-passation-design-dev/agents/sds-bootstrap.md`) — même nature de travail que le reste de la Passation/Développement (produit du code, pas un artefact de maquette, cf. §1). IA Spec dérive donc lui-même la correspondance des tokens directement depuis Figma (variables `Color`/`Typography`/`Size`, via les fichiers de référence partagés `.claude/skills/07-mapping-design-system/assets/`), sans dépendre d'aucune sortie Claude en amont — `spec` fonctionne désormais sans que `01-design` ait été exécuté du tout, seul un accès Figma MCP est requis. `sds-bootstrap` consomme ensuite `tokens.json` pour produire `design-manifest/_variables.scss`, appliqué au vrai thème par `init` (Développement) une fois celui-ci instancié.
+
+IA Spec ajoute aussi, par section, un champ `layout_order` pour capturer l'ordre des enfants/positions relatives — évite un appel MCP live en boucle de Theming pour ce genre de vérification (cas réel rencontré : réordonnancement d'une galerie, trouvé initialement seulement via `get_metadata`).
 
 **IA Spec est un agent Copilot** (contexte isolé, son propre serveur MCP Figma) plutôt qu'un skill Claude : il produit l'artefact d'entrée consommé exclusivement par des agents Copilot (Init, Contribution, Theming), donc le tenir dans le même écosystème évite une bascule Claude→Copilot au milieu du pipeline pour ce seul artefact. Il continue de lire sans problème les fichiers déjà produits par les skills Claude du projet (`mapping-ds-*.md`, `_sds-tokens.scss`, `export-assets/`, `annotations-dev-*.md`) — ce sont de simples fichiers sur disque, aucune dépendance à l'écosystème qui les a produits.
 
@@ -72,7 +74,7 @@ Les deux boucles (`Contrib ↔ Reviewer`, `Theming ↔ Reviewer`) sont gérées 
 
 Trois natures de données, trois sources différentes :
 
-1. **Valeurs de tokens** (couleurs, typo, spacing/radius) : toujours depuis `tokens.json` figé (généré par `01-design/09-sync-sds-bootstrap`), jamais re-dérivées ni par MCP live ni par lecture visuelle d'un PNG pendant la boucle.
+1. **Valeurs de tokens** (couleurs, typo, spacing/radius) : toujours depuis `tokens.json` figé (généré par l'agent `spec`, Passation), jamais re-dérivées ni par MCP live ni par lecture visuelle d'un PNG pendant la boucle.
 2. **Fidélité structurelle/visuelle** (bloc présent, ordre, responsive) :
    - **Itération 1** de chaque boucle : Design Manifest (PNG + `layout_order` figés) — rapide, gratuit, résistant à une panne de quota MCP.
    - **Itérations suivantes** (verdict `DEV_FIX`/`CONTRIB_FIX`) : bascule sur **MCP Figma live** pour un diagnostic plus précis.
@@ -100,7 +102,7 @@ Volontairement léger à ce stade — pas de skill dédié, contenu de `00-setup
 
 ## 7. Init WordPress
 
-`[IA dev]` (Copilot) initialise le socle sur la base du starterkit ads-COM : récupération des sources Git, récupération des infos base (fournies par Setup), renommage du thème, instanciation WordPress. Puis, sur la base de la documentation, des maquettes Figma, des annotations et des specs éventuelles : création des CPT, installation des plugins nécessaires. Fin de passe → Orchestrator informe `[Humain dev]` → `[contrôle dev/IW]` / `[ajustement dev/IW]`.
+`[IA dev]` (Copilot) initialise le socle sur la base du starterkit ads-COM : récupération des sources Git, récupération des infos base (fournies par Setup), renommage du thème, instanciation WordPress. Applique ensuite `design-manifest/_variables.scss` (produit par `sds-bootstrap` en Passation) au thème réellement instancié, si ce livrable existe. Puis, sur la base de la documentation, des maquettes Figma, des annotations et des specs éventuelles : création des CPT, installation des plugins nécessaires. Fin de passe → Orchestrator informe `[Humain dev]` → `[contrôle dev/IW]` / `[ajustement dev/IW]`.
 
 ---
 
@@ -141,7 +143,8 @@ Complément **mutable** (append-only) au Design Manifest **figé** (§2) — sé
 
 | Élément | Phase | Plateforme | Modèle de référence | Sortie |
 |---|---|---|---|---|
-| `spec` (IA Spec) | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/spec.md` | `index.json` + `pages/<slug>.json` write-once |
+| `spec` (IA Spec) | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/spec.md` | `index.json` + `pages/<slug>.json` + `tokens.json` write-once |
+| `sds-bootstrap` | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/sds-bootstrap.md` | `design-manifest/_variables.scss` (livrable préparé, appliqué au thème réel par `init`) |
 | Orchestrator | Développement (transverse) | Copilot (custom agent) | `03-developpement/agents/orchestrator.md` | Journal d'exécution (§8) |
 | `init` | Développement / Init | Copilot (custom agent) | `03-developpement/agents/init.md` | Socle WP instancié, CPT créés |
 | `contrib` | Développement / Contribution | Copilot (custom agent) | `03-developpement/agents/contrib.md` | Composition Gutenberg par page |

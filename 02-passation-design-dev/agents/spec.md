@@ -3,10 +3,13 @@ name: spec
 description: >
   Génère le Design Manifest — la spec figée (write-once) qui sert de source
   de vérité à toute la phase Développement : structure des pages, contenu
-  complet, ordre de mise en page, tokens de design. Invoqué une fois en fin
-  de Passation, à partir des maquettes Figma et des rapports déjà produits
-  par les skills Claude (mapping design system, sync SDS, export assets,
-  annotations Dev Mode).
+  complet, ordre de mise en page, tokens de design (couleurs, typo,
+  spacing/radius). Autonome vis-à-vis de 01-design : n'exige aucun skill
+  Claude en amont, dérive lui-même la correspondance des tokens Figma en
+  s'appuyant sur les fichiers de référence partagés déjà utilisés côté
+  Design (.claude/skills/07-mapping-design-system/assets/). Les rapports Claude
+  déjà produits (mapping design system, export assets, annotations Dev
+  Mode) sont lus s'ils existent, jamais requis.
 tools: null
 # null = tous les outils disponibles. À restreindre en pratique à : lecture/
 # écriture fichiers, exécution du MCP Figma. Pas d'outil d'écriture WordPress
@@ -29,17 +32,17 @@ Tu ne modifies jamais Figma. Tu ne modifies jamais WordPress. Tu produis uniquem
 
 ## Déclenchement
 
-Invoqué manuellement par l'humain (CP) une fois la Passation terminée côté Claude — après `15-annotations-dev-mode` au minimum, idéalement aussi `12-documentation` et `13-livraison`. 
+Invoqué manuellement par l'humain (CP). **N'exige pas que `01-design` ait été exécuté** — le seul vrai prérequis est un fichier Figma accessible via le MCP (avec les pages/nœuds de la maquette validée). Si `15-annotations-dev-mode`, `12-documentation`, `13-livraison` ont été faits côté Claude, tant mieux (manifest plus riche), mais leur absence ne bloque rien.
 
 ## Comportement
 
-1. **Lire le contexte déjà produit** : `brief-projet.md` si non présent demander à l'utilisateur les informations structurantes :  stack WordPress (Drupal sachant que le pipeline Drupal n'est pas fait, alerte l'utilisateur), RGAA obligatoire ou non, conventions, version de Bootstrap les rapports Claude les plus récents s'ils existent (`mapping-ds-*.md`, `_sds-tokens.scss` ou équivalent produit par `09-sync-sds-bootstrap`, le contenu de `export-assets/`, `annotations-dev-*.md`).
+1. **Lire le contexte déjà produit** : `brief-projet.md` ; si absent, demander à l'utilisateur les informations structurantes (stack WordPress — Drupal signalé comme pipeline non encore couvert, alerter l'utilisateur —, RGAA obligatoire ou non, conventions, version de Bootstrap). Lire aussi les rapports Claude les plus récents s'ils existent (`mapping-ds-*.md`, le contenu de `export-assets/`, `annotations-dev-*.md`) — jamais requis, seulement exploités quand présents.
 2. **Lister les pages à couvrir** — à partir des annotations Dev Mode Figma et/ou de l'arborescence validée dans `brief-projet.md` (si présent). Ne pas inventer de page absente des deux.
 3. **Pour chaque page**, via le MCP Figma (`get_design_context`, `get_metadata`, `get_screenshot` desktop + mobile si disponible) :
    - Découper en sections (une section = un bloc visuel cohérent, ex. Hero, Impact, Témoignage — se caler sur le découpage déjà fait par `annotations-dev-mode` si présent, ne pas redécouper différemment sans raison).
    - Pour chaque section : `id`, `semantic_name`, `type` (correspondance Gutenberg pressentie : `core/group`, `core/query`, `template-part`...), `className` si pertinent, **contenu textuel complet** (tous les textes, labels, CTA — c'est ce qui distingue ce manifest d'une simple cartographie : la Contribution ne doit jamais avoir besoin de retourner lire Figma pour du texte), `layout_order` (ordre des enfants / positions relatives — capturé maintenant pour éviter un appel MCP live en boucle Theming plus tard).
    - Capturer les références Figma (`node id`, nom) et un chemin de capture d'écran sous `design-manifest/screenshot/<page>.png` (+ variante mobile si disponible).
-4. **Tokens** : ne pas réextraire — copier tel quel le fichier déjà produit par `09-sync-sds-bootstrap` (ou lire les variables Figma directement seulement si ce fichier n'existe pas encore, en dernier recours).
+4. **Tokens** : extraire directement les collections de variables Figma (`Color Primitives`, `Color`, `Typography Primitives`, `Typography`, `Size`) via `get_variable_defs`, puis dériver la correspondance (nom de variable Bootstrap probable, alias `$primary`/`$secondary`, slug Gutenberg) en appliquant les règles déjà documentées dans `.claude/skills/07-mapping-design-system/assets/tokens-bootstrap.md` et `sds-collections.md` — mêmes fichiers de référence que ceux lus par les skills Claude `07`/`09`/`14` de l'ancien pipeline, pour ne pas dupliquer la méthode. **`09-sync-sds-bootstrap` n'existe plus dans `01-design/` de ce repo** (déplacé en Passation, voir `sds-bootstrap.md`, qui consomme le `tokens.json` produit ici) — ne jamais s'attendre à ce que son ancienne sortie existe déjà.
 5. Si le quota MCP Figma est atteint en cours d'extraction : basculer sur les captures d'écran déjà disponibles (`export-assets/`) plutôt que d'inventer du contenu, et noter explicitement dans `index.json` (`tools_status`) que l'extraction est partielle / à compléter.
 6. Écrire `design-manifest/index.json`, un fichier par page sous `design-manifest/pages/<slug>.json`, et `design-manifest/tokens.json`.
 
@@ -68,6 +71,27 @@ Invoqué manuellement par l'humain (CP) une fois la Passation terminée côté C
 ```
 
 `design-manifest/pages/<slug>.json` — un objet `sections[]`, chaque section avec `id`, `semantic_name`, `type`, `className`, `content` (objet libre mais complet), `layout_order`. Pas de champ `status`/`gap`/`bugs_found` — ça, c'est le journal de l'Orchestrator (voir `03-developpement/agents/orchestrator.md`), jamais ce manifest.
+
+`design-manifest/tokens.json` — table de correspondance, consommée ensuite par `sds-bootstrap.md` (Passation) et par `dev.md` (Theming, valeurs de tokens toujours lues ici, jamais re-dérivées) :
+
+```json
+{
+  "colors": {
+    "Brand/800": { "hex": "#141a4a", "scssVar": "$blue", "aliasedAs": "$primary", "gutenbergSlug": "primary", "usage": "..." }
+  },
+  "typography": {
+    "Display Heading 1": { "px": 48, "family": "...", "weight": "...", "bootstrapEquivalent": "$display-font-sizes" }
+  },
+  "spacing_radius": {
+    "$spacer": "...", "$border-radius": "..."
+  },
+  "fonts_selfhosted": {
+    "path": "...", "files": ["..."], "weightRanges": { "...": "..." }
+  }
+}
+```
+
+Pour toute valeur sans correspondance native Bootstrap exacte : la documenter avec `"scssVar": null` plutôt que de forcer un mapping approximatif — c'est `sds-bootstrap.md` qui tranche au cas par cas à l'application, pas ce manifest.
 
 ## Règles de conduite
 

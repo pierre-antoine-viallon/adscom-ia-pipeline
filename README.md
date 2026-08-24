@@ -11,7 +11,7 @@ Inspiré de la plateforme de skills communautaire : [figma.com/community/skills]
 ```
 00-setup/                    ← amorçage projet (BDD, Git) — documentaire pour l'instant, pas de skill
 01-design/                   ← 16 skills Claude Code (identiques à figma-mcp-claude-skills)
-02-passation-design-dev/     ← agent Copilot "IA Spec" (Design Manifest)
+02-passation-design-dev/     ← agents Copilot "IA Spec" (Design Manifest) + "sds-bootstrap" (tokens → SCSS)
 03-developpement/            ← agents Copilot Init/Contribution/Theming + Orchestrator
 ```
 
@@ -56,7 +56,6 @@ Pour figer une version précise plutôt que `main` : `install.ps1 -Ref v1.2.0` (
 | 06 | **accessibilite-rgaa** | `/06-accessibilite-rgaa` | Lecture | Audit RGAA 4.1 : contrastes (3.2/3.3), alternatives textuelles (1.1), structure des titres (9.1), zones cliquables (13.11), formulaires (11.x) |
 | 07 | **mapping-design-system** | `/07-mapping-design-system` | Lecture | Analyse les couleurs hardcodées vs. liées aux variables SDS. Produit un plan de mise à jour tokens en 3 phases |
 | 08 | **nettoyage-figma** | `/08-nettoyage-figma` | **Écriture** | Automatise le nettoyage : renommage sémantique des calques, liaison hex → variables SDS, ré-instanciation des frames brutes |
-| 09 | **sync-sds-bootstrap** | `/09-sync-sds-bootstrap` | Lecture | Génère `_sds-tokens.scss` depuis les variables Figma SDS |
 | 10 | **composants** | `/10-composants` | **Écriture** | Détecte les patterns répétés et les transforme en composants Figma avec variantes et propriétés exposées |
 | 11 | **export-assets** | `/11-export-assets` | Lecture | Génère un prompt Figma AI qui prépare l'export des assets vers une page "Export" |
 | 12 | **documentation** | `/12-documentation` | — | Génère la documentation technique du projet |
@@ -64,7 +63,7 @@ Pour figer une version précise plutôt que `main` : `install.ps1 -Ref v1.2.0` (
 | 14 | **sync-sds-depuis-maquette** | `/14-sync-sds-depuis-maquette` | **Écriture** | Symétrique inverse du 07 : fait évoluer les variables du SDS depuis une maquette hardcodée validée par le client |
 | 15 | **annotations-dev-mode** | `/15-annotations-dev-mode` | **Écriture** (annotations) | Pose des annotations Dev Mode : correspondance ACF Block/Gutenberg ou Drupal/Paragraphs, contrôleur JS Bootstrap 5, rappels RGAA |
 
-Le nom de dossier (préfixe numérique inclus) est la slash command exacte — `/00-brief-onboarding`, pas `/brief-onboarding`.
+Le nom de dossier (préfixe numérique inclus) est la slash command exacte — `/00-brief-onboarding`, pas `/brief-onboarding`. Le `09` est absent volontairement (pas un trou à combler) : `sync-sds-bootstrap` a été déplacé en Passation sous le nom `sds-bootstrap` — il produit du code (SCSS), pas un artefact de maquette, voir `PIPELINE-AGENTIQUE.md` §1 et `02-passation-design-dev/README.md`. Les numéros des autres skills ne sont jamais réutilisés/décalés.
 
 ### Ordre d'exécution recommandé (nouveau projet)
 
@@ -77,7 +76,7 @@ Le nom de dossier (préfixe numérique inclus) est la slash command exacte — `
    Parcours revue                Parcours tokens
 5. /04-review-ux-ui           5. /07-mapping-design-system
 6. /05-ajustements            6. /08-nettoyage-figma
-7. /06-accessibilite-rgaa     7. /09-sync-sds-bootstrap
+7. /06-accessibilite-rgaa
 
 8.  /10-composants
 9.  /11-export-assets
@@ -90,11 +89,13 @@ Le nom de dossier (préfixe numérique inclus) est la slash command exacte — `
 
 Toujours commencer par `/00-brief-onboarding` — `brief-projet.md` est lu par tous les skills et agents en aval.
 
+La correspondance tokens Figma → variables Sass (ex-`09-sync-sds-bootstrap`) ne se joue plus ici : voir `agents/sds-bootstrap.md` en Passation.
+
 ---
 
 ## Passation et Développement (`02-passation-design-dev/`, `03-developpement/`)
 
-Agents GitHub Copilot — voir `PIPELINE-AGENTIQUE.md` pour le rôle de chacun (IA Spec, Orchestrator, IA dev, IA Contrib, IA reviewer). Contenu comportemental rédigé (2026-08-24), pas encore validé sur un vrai projet — voir les `README.md` de `02-passation-design-dev/` et `03-developpement/`.
+Agents GitHub Copilot — voir `PIPELINE-AGENTIQUE.md` pour le rôle de chacun (IA Spec, sds-bootstrap, Orchestrator, IA dev, IA Contrib, IA reviewer). Contenu comportemental rédigé (2026-08-24), pas encore validé sur un vrai projet — voir les `README.md` de `02-passation-design-dev/` et `03-developpement/`.
 
 ---
 

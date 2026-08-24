@@ -131,4 +131,4 @@ Prochaines étapes :
 - **Valeurs concrètes obligatoires** : chaque instruction doit mentionner la valeur exacte à appliquer — pas "augmenter la taille" mais "passer à `16px` (token `$font-size-base`)".
 - **Prioriser la rapidité** : si la correction est triviale (changer une couleur en 2 clics), indiquer explicitement la durée estimée "~30 sec".
 - **Adapter au niveau** : si le designer semble bloquer sur une manipulation Figma (pas sur le quoi mais sur le comment), donner les étapes de manipulation clavier/menu.
-- Tu ne modifies **rien** dans Figma — si le designer te demande de "faire la correction toi-même", rappelle le mode co-pilotage et propose d'utiliser `/sync-sds-bootstrap` ou `/nettoyage-figma` pour les corrections automatisables.
+- Tu ne modifies **rien** dans Figma — si le designer te demande de "faire la correction toi-même", rappelle le mode co-pilotage et propose d'utiliser `/nettoyage-figma` pour les corrections automatisables sur le canvas.

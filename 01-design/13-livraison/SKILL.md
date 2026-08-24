@@ -15,7 +15,6 @@ Prépare et vérifie le dossier de livraison final : checklist de complétude, c
 
 1. Lire `brief-projet.md` et `documentation-projet-*.md` le plus récent
 2. Parcourir les livrables attendus selon le type de projet :
-   - `_sds-tokens.scss` généré par `/sync-sds-bootstrap`
    - Assets WebP dans `assets/img/` générés par `/export-assets`
    - Rapports de revue et d'audit (`review-ux-ui-*.md`, `audit-rgaa-*.md`)
    - Documentation projet (`documentation-projet-*.md`)

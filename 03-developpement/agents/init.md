@@ -28,9 +28,10 @@ Invoqué par l'Orchestrator en tout début de phase Développement. Prérequis :
 2. **Récupération des infos base** : lire les identifiants de connexion base de données fournis par Setup (jamais en dur dans le code — variables d'environnement ou fichier de config standard WordPress `wp-config.php` non versionné).
 3. **Renommage du thème** : dupliquer/renommer le starterkit ads-COM (thème parent + enfant) selon le slug du projet défini dans `brief-projet.md`.
 4. **Instanciation WordPress** : installer le noyau WordPress si absent, activer le thème enfant renommé (jamais le parent — piège déjà rencontré sur un projet réel : CPT invisibles parce que le thème parent était actif au lieu de l'enfant).
-5. **Création des CPT** : d'après `design-manifest/pages/*.json`, les annotations Dev Mode (`annotations-dev-*.md`, produites par le skill Claude `15-annotations-dev-mode`) et toute spec CPT/taxonomie fournie. Utiliser la méthode de décision déjà établie côté annotations : bloc natif Gutenberg > composition > Query Loop natif sur CPT > ACF Block en dernier recours — un CPT ne se crée que pour du contenu réellement répété/interrogé à plusieurs endroits.
-6. **Installation des plugins** : uniquement ceux identifiés comme nécessaires (annotations, cahier des charges) — jamais de plugin ajouté par défaut sans justification tracée.
-7. Rapporter à l'Orchestrator : succès/échec, liste des CPT créés, plugins installés, tout point bloquant (ex. accès base indisponible).
+5. **Application des tokens** : si `design-manifest/_variables.scss` existe (produit par l'agent `sds-bootstrap` en Passation), le copier/fusionner dans le fichier `_variables.scss` réel du thème instancié — c'est la première fois que ce livrable préparé touche un vrai thème, `sds-bootstrap` lui-même ne l'a jamais fait. Si le fichier n'existe pas (Passation n'est pas allée jusque-là), continuer sans — pas bloquant.
+6. **Création des CPT** : d'après `design-manifest/pages/*.json`, les annotations Dev Mode (`annotations-dev-*.md`, produites par le skill Claude `15-annotations-dev-mode`) et toute spec CPT/taxonomie fournie. Utiliser la méthode de décision déjà établie côté annotations : bloc natif Gutenberg > composition > Query Loop natif sur CPT > ACF Block en dernier recours — un CPT ne se crée que pour du contenu réellement répété/interrogé à plusieurs endroits.
+7. **Installation des plugins** : uniquement ceux identifiés comme nécessaires (annotations, cahier des charges) — jamais de plugin ajouté par défaut sans justification tracée.
+8. Rapporter à l'Orchestrator : succès/échec, liste des CPT créés, plugins installés, tout point bloquant (ex. accès base indisponible).
 
 ## Format de sortie
 
