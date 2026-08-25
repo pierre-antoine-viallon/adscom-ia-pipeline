@@ -102,13 +102,15 @@ Volontairement léger à ce stade — pas de skill dédié, contenu de `00-setup
 
 ## 7. Init WordPress
 
-`[IA dev]` (Copilot) initialise le socle sur la base du starterkit ads-COM : récupération des sources Git, récupération des infos base (fournies par Setup), renommage du thème, instanciation WordPress. Applique ensuite `design-manifest/_variables.scss` (produit par `sds-bootstrap` en Passation) au thème réellement instancié, si ce livrable existe. Puis, sur la base de la documentation, des maquettes Figma, des annotations et des specs éventuelles : création des CPT, installation des plugins nécessaires. Fin de passe → Orchestrator informe `[Humain dev]` → `[contrôle dev/IW]` / `[ajustement dev/IW]`.
+`[IA dev]` (Copilot) initialise le socle sur la base du starterkit ads-COM, sous `wordpress/` (racine du site, isolée du reste du repo — cf. §9) : récupération des sources Git, récupération des infos base (fournies par Setup), renommage du thème, instanciation WordPress. Applique ensuite `agents/design-manifest/_variables.scss` (produit par `sds-bootstrap` en Passation) au thème réellement instancié, si ce livrable existe. Puis, sur la base de la documentation, des maquettes Figma, des annotations et des specs éventuelles : création des CPT, installation des plugins nécessaires. Fin de passe → Orchestrator informe `[Humain dev]` → `[contrôle dev/IW]` / `[ajustement dev/IW]`.
 
 ---
 
 ## 8. Journal d'exécution de l'Orchestrator
 
 Complément **mutable** (append-only) au Design Manifest **figé** (§2) — sépare la spec (ce qui était demandé) de l'historique (ce qui s'est passé), cohérent avec l'invariant un-producteur du reste de la bibliothèque.
+
+Chemin concret dans le repo projet : `agents/journal.ndjson` (voir §9) — seul l'Orchestrator y écrit, les sous-agents lui rapportent leur résultat.
 
 **Grain d'une entrée** = un événement, jamais réécrit.
 
@@ -144,18 +146,42 @@ Complément **mutable** (append-only) au Design Manifest **figé** (§2) — sé
 | Élément | Phase | Plateforme | Modèle de référence | Sortie |
 |---|---|---|---|---|
 | `spec` (IA Spec) | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/spec.md` | `index.json` + `pages/<slug>.json` + `tokens.json` write-once |
-| `sds-bootstrap` | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/sds-bootstrap.md` | `design-manifest/_variables.scss` (livrable préparé, appliqué au thème réel par `init`) |
+| `sds-bootstrap` | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/sds-bootstrap.md` | `agents/design-manifest/_variables.scss` (livrable préparé, appliqué au thème réel par `init`) |
 | Orchestrator | Développement (transverse) | Copilot (custom agent) | `03-developpement/agents/orchestrator.md` | Journal d'exécution (§8) |
 | `init` | Développement / Init | Copilot (custom agent) | `03-developpement/agents/init.md` | Socle WP instancié, CPT créés |
 | `contrib` | Développement / Contribution | Copilot (custom agent) | `03-developpement/agents/contrib.md` | Composition Gutenberg par page |
 | `reviewer` | Développement / Contribution + Theming | Copilot (custom agent) | `03-developpement/agents/reviewer.md` | Verdict classé (§3) |
 | `dev` (theming) | Développement / Theming | Copilot (custom agent) | `03-developpement/agents/dev.md` | SCSS/theming par bloc |
 
-**Pourquoi un repo organisé par dossier de phase plutôt qu'un clone/submodule direct comme l'ancien `figma-mcp-claude-skills`** : la découverte de skills Claude Code (`.claude/skills/`) n'est **pas récursive** — un skill placé dans un sous-dossier (ex. `.claude/skills/design/03-inspection/`) ne serait plus détecté du tout, pas juste déplacé. L'ancien repo fonctionnait en submodule/clone direct parce que sa racine était déjà, structurellement, `.claude/skills/` à plat. Ce repo-ci privilégie la lisibilité par phase dans la source (`00-setup/`, `01-design/`, `02-passation-design-dev/`, `03-developpement/`) et délègue l'aplatissement à un **script d'installation** (`scripts/install.ps1`/`.sh`, voir `README.md`) qui copie `01-design/*/` vers `.claude/skills/*/` et fusionne les dossiers `agents/` des phases Passation+Développement vers `.github/agents/*.md` du projet consommateur.
+**Pourquoi un repo organisé par dossier de phase plutôt qu'un clone/submodule direct comme l'ancien `figma-mcp-claude-skills`** : la découverte de skills Claude Code (`.claude/skills/`) n'est **pas récursive** — un skill placé dans un sous-dossier (ex. `.claude/skills/design/03-inspection/`) ne serait plus détecté du tout, pas juste déplacé. L'ancien repo fonctionnait en submodule/clone direct parce que sa racine était déjà, structurellement, `.claude/skills/` à plat. Ce repo-ci privilégie la lisibilité par phase dans la source (`00-setup/`, `01-design/`, `02-passation-design-dev/`, `03-developpement/`) et délègue l'aplatissement à un **script d'installation** (`scripts/install.ps1`/`.sh`, voir `README.md`).
+
+**Mécanisme d'installation (révisé)** : le script ajoute `adscom-ia-pipeline` comme **submodule Git** en `agents/_pipeline-repo/` dans le projet consommateur — source de vérité versionnée et traçable (le SHA du submodule dit exactement quelle version du pipeline est utilisée), plutôt que l'ancien clone temporaire supprimé après coup. Depuis ce submodule, le script copie `01-design/*/` vers `.claude/skills/*/` et fusionne les dossiers `agents/` des phases Passation+Développement vers `.github/agents/*.md` — ces deux chemins restent imposés par Claude Code et GitHub Copilot respectivement (racine du repo, non récursif) et ne peuvent pas eux-mêmes vivre sous `agents/`. Relancer le script met à jour le submodule puis resynchronise les deux dossiers plats.
+
+**Organisation attendue dans le repo d'un projet WordPress consommateur** :
+
+```
+mon-projet-wp/
+├── .claude/skills/            ← chemin imposé Claude Code, généré par le script
+├── .github/agents/            ← chemin imposé Copilot, généré par le script
+├── agents/                    ← tout ce qui n'a pas de chemin imposé par un outil
+│   ├── _pipeline-repo/        ← submodule adscom-ia-pipeline (source de vérité)
+│   ├── design-manifest/       ← livrable write-once de l'agent spec (§2)
+│   └── journal.ndjson         ← journal d'exécution de l'Orchestrator (§8)
+└── wordpress/                 ← sources WordPress classiques, isolées du reste
+    ├── wp-content/
+    │   ├── themes/
+    │   └── plugins/
+    ├── wp-config.php
+    └── ...
+```
+
+Isoler le CMS sous `wordpress/` garde la racine du repo entièrement dédiée au tooling (pipeline, skills, agents) et évite tout mélange avec le code WordPress classique.
 
 **Ancien repo `figma-mcp-claude-skills`** : laissé intact, aucune action dessus — il continue de servir tel quel les projets déjà en cours (RJAC, CC4V, Neoville, TPbCCI45), installés par clone/submodule direct comme avant. Ce repo-ci (`adscom-ia-pipeline`) est la source de vérité pour tout nouveau projet à partir de maintenant.
 
-**Tranché (2026-08-24)** : `reviewer` est un seul agent à deux modes (Contribution/Theming, checklist choisie selon la phase transmise par l'Orchestrator en tête de l'invocation) — pas deux agents séparés. Décision prise en autonomie pendant la rédaction du contenu comportemental complet des 6 fichiers `agents/*.md` (prompt système, journal d'exécution en `.orchestrator/journal.ndjson`, logique de routage détaillée dans `orchestrator.md`) — pas encore validé sur un vrai projet, en particulier le format exact des identifiants `tools`/`mcpServers` Copilot (structure plausible, pas vérifiée contre la doc officielle caractère pour caractère).
+**Tranché (2026-08-24)** : `reviewer` est un seul agent à deux modes (Contribution/Theming, checklist choisie selon la phase transmise par l'Orchestrator en tête de l'invocation) — pas deux agents séparés. Décision prise en autonomie pendant la rédaction du contenu comportemental complet des 6 fichiers `agents/*.md` (prompt système, journal d'exécution — voir §8 pour le chemin `agents/journal.ndjson`, logique de routage détaillée dans `orchestrator.md`) — pas encore validé sur un vrai projet, en particulier le format exact des identifiants `tools`/`mcpServers` Copilot (structure plausible, pas vérifiée contre la doc officielle caractère pour caractère).
+
+**Point ouvert issu de cette révision** : les fichiers comportementaux `02-passation-design-dev/agents/*.md` et `03-developpement/agents/*.md` référencent encore `design-manifest/` et `.orchestrator/journal.ndjson` comme chemins à la racine du projet (état antérieur à cette révision) — à mettre à jour vers `agents/design-manifest/` et `agents/journal.ndjson` dans une passe séparée avant la première utilisation réelle, pour rester cohérents avec l'organisation ci-dessus.
 
 ---
 

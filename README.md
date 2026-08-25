@@ -37,7 +37,9 @@ curl -sL https://raw.githubusercontent.com/pierre-antoine-viallon/adscom-ia-pipe
 irm https://raw.githubusercontent.com/pierre-antoine-viallon/adscom-ia-pipeline/main/scripts/install.ps1 | iex
 ```
 
-Le script clone temporairement ce repo, copie `01-design/*/` dans `.claude/skills/` du projet, fusionne les `agents/*.md` de `02-passation-design-dev/` et `03-developpement/` dans `.github/agents/`, écrit un marqueur `.claude/skills/.source-version` (commit + date d'installation), puis nettoie le clone temporaire. Le résultat (fichiers plats) est ensuite committé normalement dans le repo du projet — relancer le script plus tard pour mettre à jour, en relisant le diff avant de committer.
+Le script ajoute ce repo comme **submodule Git** en `agents/_pipeline-repo/` (source de vérité versionnée, remplace l'ancien clone-temporaire-puis-suppression), puis aplatit `01-design/*/` dans `.claude/skills/` du projet et fusionne les `agents/*.md` de `02-passation-design-dev/` et `03-developpement/` dans `.github/agents/`. Il crée aussi `agents/design-manifest/` (vide, rempli plus tard par l'agent `spec`) et `agents/journal.ndjson` (journal de l'Orchestrator) s'ils n'existent pas déjà. Le résultat (submodule + fichiers plats) est ensuite committé normalement dans le repo du projet — relancer le script plus tard pour mettre à jour le submodule et resynchroniser `.claude/skills/`/`.github/agents/`, en relisant le diff avant de committer.
+
+Voir `PIPELINE-AGENTIQUE.md` §9 pour l'organisation complète attendue dans le repo projet consommateur (`agents/`, `.claude/skills/`, `.github/agents/`, sources WordPress isolées).
 
 Pour figer une version précise plutôt que `main` : `install.ps1 -Ref v1.2.0` (ou `install.sh --ref v1.2.0`).
 

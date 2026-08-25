@@ -1,17 +1,20 @@
 <#
 .SYNOPSIS
-    Installe les skills Claude Code et les agents Copilot d'adscom-ia-pipeline
-    dans un projet WordPress consommateur.
+    Installe ou met a jour le submodule agents/_pipeline-repo, puis aplatit
+    les skills Claude Code et les agents Copilot dans un projet WordPress
+    consommateur.
 
 .DESCRIPTION
-    Clone temporairement adscom-ia-pipeline, aplatit 01-design/*/ vers
-    .claude/skills/, fusionne les agents/*.md de 02-passation-design-dev/ et
-    03-developpement/ vers .github/agents/, puis nettoie le clone temporaire.
-    Le resultat (fichiers plats) doit ensuite etre committe normalement dans
-    le repo du projet consommateur.
+    Ajoute (ou synchronise) adscom-ia-pipeline comme submodule Git en
+    agents/_pipeline-repo, aplatit 01-design/*/ vers .claude/skills/,
+    fusionne les agents/*.md de 02-passation-design-dev/ et
+    03-developpement/ vers .github/agents/, et cree agents/design-manifest/
+    et agents/journal.ndjson s'ils n'existent pas encore.
+    Le resultat (submodule + fichiers plats) doit ensuite etre committe
+    normalement dans le repo du projet consommateur.
 
 .PARAMETER Ref
-    Branche ou tag a installer. Par defaut : main.
+    Branche, tag ou commit a installer. Par defaut : main.
 
 .PARAMETER RepoUrl
     URL du repo source. Par defaut : adscom-ia-pipeline sur GitHub.
@@ -32,39 +35,54 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$tmp = Join-Path $env:TEMP ("adscom-ia-pipeline-" + [guid]::NewGuid())
-Write-Host "Clonage de $RepoUrl@$Ref dans $tmp..."
-git clone --quiet --depth 1 --branch $Ref $RepoUrl $tmp
+$pipelineRepo = Join-Path $ProjectRoot "agents\_pipeline-repo"
 
-try {
-    $skillsDest = Join-Path $ProjectRoot ".claude\skills"
-    $agentsDest = Join-Path $ProjectRoot ".github\agents"
-    New-Item -ItemType Directory -Force -Path $skillsDest | Out-Null
-    New-Item -ItemType Directory -Force -Path $agentsDest | Out-Null
+if (Test-Path (Join-Path $pipelineRepo ".git")) {
+    Write-Host "Submodule agents/_pipeline-repo existant, mise a jour vers $Ref..."
+    git -C $pipelineRepo fetch --quiet origin $Ref
+    git -C $pipelineRepo checkout --quiet FETCH_HEAD
+}
+else {
+    Write-Host "Ajout du submodule agents/_pipeline-repo ($RepoUrl@$Ref)..."
+    New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot "agents") | Out-Null
+    git -C $ProjectRoot submodule add --quiet $RepoUrl "agents/_pipeline-repo"
+    git -C $pipelineRepo fetch --quiet origin $Ref
+    git -C $pipelineRepo checkout --quiet FETCH_HEAD
+}
 
-    Write-Host "Copie des skills Claude Code (01-design/) vers $skillsDest ..."
-    Get-ChildItem (Join-Path $tmp "01-design") -Directory | ForEach-Object {
-        Copy-Item $_.FullName (Join-Path $skillsDest $_.Name) -Recurse -Force
-    }
+$skillsDest = Join-Path $ProjectRoot ".claude\skills"
+$agentsDest = Join-Path $ProjectRoot ".github\agents"
+New-Item -ItemType Directory -Force -Path $skillsDest | Out-Null
+New-Item -ItemType Directory -Force -Path $agentsDest | Out-Null
 
-    Write-Host "Fusion des agents Copilot vers $agentsDest ..."
-    foreach ($phase in "02-passation-design-dev", "03-developpement") {
-        $agentsSrc = Join-Path $tmp "$phase\agents"
-        if (Test-Path $agentsSrc) {
-            Get-ChildItem $agentsSrc -Filter "*.md" | ForEach-Object {
-                Copy-Item $_.FullName (Join-Path $agentsDest $_.Name) -Force
-            }
+Write-Host "Copie des skills Claude Code (01-design/) vers $skillsDest ..."
+Get-ChildItem (Join-Path $pipelineRepo "01-design") -Directory | ForEach-Object {
+    Copy-Item $_.FullName (Join-Path $skillsDest $_.Name) -Recurse -Force
+}
+
+Write-Host "Fusion des agents Copilot vers $agentsDest ..."
+foreach ($phase in "02-passation-design-dev", "03-developpement") {
+    $agentsSrc = Join-Path $pipelineRepo "$phase\agents"
+    if (Test-Path $agentsSrc) {
+        Get-ChildItem $agentsSrc -Filter "*.md" | ForEach-Object {
+            Copy-Item $_.FullName (Join-Path $agentsDest $_.Name) -Force
         }
     }
-
-    $commit = (git -C $tmp rev-parse --short HEAD).Trim()
-    $marker = "source: $RepoUrl@$Ref (commit $commit, installe le $(Get-Date -Format s))"
-    Set-Content -Path (Join-Path $skillsDest ".source-version") -Value $marker -Encoding utf8
-
-    Write-Host ""
-    Write-Host "Installe depuis $Ref (commit $commit)."
-    Write-Host "Verifiez le diff (git status) puis committez .claude/skills/ et .github/agents/."
 }
-finally {
-    Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
+
+Write-Host "Preparation de agents/design-manifest/ et agents/journal.ndjson ..."
+$manifestDest = Join-Path $ProjectRoot "agents\design-manifest"
+New-Item -ItemType Directory -Force -Path $manifestDest | Out-Null
+$manifestKeep = Join-Path $manifestDest ".gitkeep"
+if (-not (Test-Path $manifestKeep)) {
+    New-Item -ItemType File -Path $manifestKeep | Out-Null
 }
+$journalPath = Join-Path $ProjectRoot "agents\journal.ndjson"
+if (-not (Test-Path $journalPath)) {
+    New-Item -ItemType File -Path $journalPath | Out-Null
+}
+
+$commit = (git -C $pipelineRepo rev-parse --short HEAD).Trim()
+Write-Host ""
+Write-Host "Installe depuis $Ref (commit $commit)."
+Write-Host "Verifiez le diff (git status) puis committez agents/, .claude/skills/, .github/agents/ et .gitmodules."
