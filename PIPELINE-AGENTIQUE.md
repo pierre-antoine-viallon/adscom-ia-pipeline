@@ -44,6 +44,8 @@ L'Orchestrator reste un **routeur déterministe** : séquence Init → Contribut
 
 **Décision actée (Option A)** : le Design Manifest produit par IA Spec est **write-once** — généré une fois, jamais retouché par les agents en aval. Respecte l'invariant déjà en place dans toute la bibliothèque Claude (un skill = un producteur, plusieurs consommateurs en lecture), étendu tel quel au monde Copilot. Une révision Figma en cours de Développement devient un événement explicite (nouvelle version versionnée du manifest, régénérée par IA Spec), jamais une mutation silencieuse.
 
+**Précision (2026-08-26)** : « write-once » signifie *un seul producteur, jamais muté par un consommateur* — pas *exécuté une seule fois dans la vie du projet*. IA Spec reste l'unique écrivain du manifest mais peut être ré-invoqué pour régénérer des entrées ciblées quand la maquette évolue après la Passation initiale — voir §2 bis (rejeu en delta).
+
 **Révision (2026-08-24)** : `09-sync-sds-bootstrap` (Claude, `01-design/`) a été retiré de ce repo et remplacé par l'agent Copilot `sds-bootstrap` (`02-passation-design-dev/agents/sds-bootstrap.md`) — même nature de travail que le reste de la Passation/Développement (produit du code, pas un artefact de maquette, cf. §1). IA Spec dérive donc lui-même la correspondance des tokens directement depuis Figma (variables `Color`/`Typography`/`Size`, via les fichiers de référence partagés `.claude/skills/07-mapping-design-system/assets/`), sans dépendre d'aucune sortie Claude en amont — `spec` fonctionne désormais sans que `01-design` ait été exécuté du tout, seul un accès Figma MCP est requis. `sds-bootstrap` consomme ensuite `tokens.json` pour produire `design-manifest/_variables.scss`, appliqué au vrai thème par `init` (Développement) une fois celui-ci instancié.
 
 IA Spec ajoute aussi, par section, un champ `layout_order` pour capturer l'ordre des enfants/positions relatives — évite un appel MCP live en boucle de Theming pour ce genre de vérification (cas réel rencontré : réordonnancement d'une galerie, trouvé initialement seulement via `get_metadata`).
@@ -53,6 +55,22 @@ IA Spec ajoute aussi, par section, un champ `layout_order` pour capturer l'ordre
 Son modèle de référence vit dans `02-passation-design-dev/agents/spec.md` (§9) — copié dans le `.github/agents/` du projet WordPress par le script d'installation, pas exécuté depuis ce repo.
 
 **Révision (2026-08-26) — assets graphiques, dépôt manuel** : `design-manifest/assets/` accueille les exports Figma (photos/formes/icônes/logos), déposés **manuellement par l'humain designer** — jamais téléchargés par `spec` (le pipeline `download_assets` via URL est abandonné, cf. `01-design/11-export-assets`). Structure calée sur l'export réel (dézippage direct, aucun tri manuel requis) : `formes/`, `icones/`, `logos/` à la racine (assets réutilisables au niveau du thème, lus par `dev`), `pages/<slug>/` (photos de contenu propres à une page, même slug que `pages/<slug>.json`, lues par `contrib`). `spec` se limite à vérifier la présence du dossier et à écrire `assets/index.json` en regard — jamais à le peupler lui-même.
+
+---
+
+## 2 bis. Rejeu en delta — maquette modifiée ou nouvelle feature (2026-08-26)
+
+**Problème** : après la Passation initiale, la maquette Figma peut encore évoluer (retouche visuelle, nouvelle feature) pendant que le Développement est déjà en cours ou terminé. Il faut pouvoir régénérer uniquement les parties concernées du Design Manifest et rejouer uniquement les unités 03 impactées, sans repartir de zéro ni re-scanner tout le fichier Figma (coût MCP, cf. §4).
+
+**Déclencheur** : humain (CP), jamais automatique — il fournit la liste des frames qu'il sait modifiées ou ajoutées.
+
+**Étapes** :
+1. L'humain liste les frames/pages concernées.
+2. IA Spec compare, pour ces frames uniquement, l'état **Figma live** et l'état **site live** (même technique de comparaison que `reviewer`, cf. §3 — mais portée par IA Spec elle-même, pas par un appel cross-phase à l'agent `reviewer` : l'Orchestrator reste scopé au Développement, cf. §1). Comparer directement site vs Figma plutôt que manifest vs Figma capture en un seul passage deux causes de divergence possibles (évolution de la maquette **et** dérive d'implémentation) — à distinguer explicitement dans le rapport, ce sont deux causes différentes même si le traitement en aval est le même.
+3. IA Spec produit un rapport de delta par frame (`design-manifest/delta-report-<date>.md`) : nature du delta (bloc ajouté / contenu changé / token changé / page absente du manifest = nouvelle feature), et un plan d'action proposé (quelles `pages/<slug>.json` régénérer, quelles unités 03 rejouer). IA Spec ne journalise pas (seul l'Orchestrator écrit dans `agents/journal.ndjson`, cf. §8) — ce rapport est un artefact de Passation, pas une entrée de journal.
+4. L'humain valide (ou ajuste) le plan.
+5. IA Spec régénère uniquement les `pages/<slug>.json` validées (page modifiée) ou en crée de nouvelles (nouvelle feature) — même mécanisme dans les deux cas, seule la présence préalable de l'entrée diffère. Chaque page régénérée voit son `manifest_version` incrémenté (nouveau champ, cf. §9) pour que le journal 03 puisse tracer contre quelle version de la page un passage Contribution/Theming a eu lieu.
+6. L'Orchestrator reprend en 03 **uniquement sur les unités listées dans le plan validé** : `loop_iteration_started` reçoit une nouvelle unité si la page/le bloc est absent du mapping WordPress existant (nouvelle feature → traité comme neuf), ou reprend une unité déjà connue avec un compteur d'itération remis à zéro (page modifiée → nouveau passage sur contenu à jour, pas une continuation de l'ancien passage). Les unités hors plan ne sont pas retouchées.
 
 ---
 
@@ -142,6 +160,7 @@ Chemin concret dans le repo projet : `agents/journal.ndjson` (voir §9) — seul
 - `git_commit` (hash + qui a autorisé — toujours un humain)
 - `checkpoint` (passage d'un `[contrôle …]`/`[ajustement …]` du schéma, résultat)
 - `external_ticket_created` (marqueur Mantis, pas d'automatisation pour l'instant)
+- `delta_replay_started` (reprise en delta suite à un plan IA Spec validé par l'humain, cf. §2 bis — payload : liste des unités en scope + `manifest_version` de référence pour chacune)
 
 ---
 
@@ -169,8 +188,9 @@ mon-projet-wp/
 ├── .github/agents/            ← chemin imposé Copilot, généré par le script
 ├── agents/                    ← tout ce qui n'a pas de chemin imposé par un outil
 │   ├── _pipeline-repo/        ← submodule adscom-ia-pipeline (source de vérité)
-│   ├── design-manifest/       ← livrable write-once de l'agent spec (§2)
-│   │   ├── index.json / tokens.json / pages/<slug>.json / screenshot/
+│   ├── design-manifest/       ← livrable write-once de l'agent spec (§2, régénérable en delta cf. §2 bis)
+│   │   ├── index.json / tokens.json / pages/<slug>.json (champ manifest_version) / screenshot/
+│   │   ├── delta-report-<date>.md   ← rapport + plan d'action d'un rejeu en delta (§2 bis)
 │   │   └── assets/            ← dépôt MANUEL par l'humain designer (§2)
 │   │       ├── formes/ icones/ logos/   ← lus par dev (theming)
 │   │       └── pages/<slug>/            ← lus par contrib (photos)
