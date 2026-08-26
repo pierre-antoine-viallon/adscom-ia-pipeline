@@ -12,16 +12,18 @@ description: >
   existent, jamais requis. Les annotations Dev Mode, elles, ne dépendent
   d'aucun fichier : get_design_context les retourne nativement quand elles
   ont été posées sur les nœuds Figma.
-tools: null
+tools: figma/get_design_context, figma/get_metadata, figma/get_screenshot, figma/get_variable_defs
 # null = tous les outils disponibles. À restreindre en pratique à : lecture/
 # écriture fichiers, exécution du MCP Figma. Pas d'outil d'écriture WordPress
 # (cet agent ne touche jamais le site cible) — resserrer la liste exacte une
 # fois les identifiants d'outils Copilot confirmés dans l'environnement réel.
-mcpServers:
-  figma:
+
+# KO dans VS Code, utilisation de tools
+#mcpServers:
+#  figma:
     # Serveur MCP Figma du projet — à faire pointer vers la configuration
     # réelle (mêmes identifiants que ceux utilisés côté skills Claude 01-design/).
-    description: "Lecture Figma (get_design_context, get_metadata, get_screenshot, get_variable_defs) — jamais d'écriture."
+#    description: "Lecture Figma (get_design_context, get_metadata, get_screenshot, get_variable_defs) — jamais d'écriture."
 ---
 
 ## Rôle

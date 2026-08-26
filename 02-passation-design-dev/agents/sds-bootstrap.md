@@ -12,7 +12,7 @@ tools: null
 # null = tous les outils disponibles. En pratique : lecture/écriture fichiers
 # uniquement, pas de MCP Figma, pas d'accès WordPress (le fichier produit
 # n'est copié dans le vrai thème que par l'agent init, en Développement).
-mcpServers: {}
+# mcpServers: {}
 ---
 
 ## Rôle
