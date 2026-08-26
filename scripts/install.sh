@@ -53,8 +53,8 @@ mkdir -p "$SKILLS_DEST" "$AGENTS_DEST"
 
 echo "Copie des skills Claude Code (01-design/) vers $SKILLS_DEST ..."
 for skill_dir in "$PIPELINE_REPO"/01-design/*/; do
-  name="$(basename "$skill_dir")"
-  cp -r "$skill_dir" "$SKILLS_DEST/$name"
+  # name="$(basename "$skill_dir")"
+  cp -r "$skill_dir" "$SKILLS_DEST/"
 done
 
 echo "Fusion des agents Copilot vers $AGENTS_DEST ..."
