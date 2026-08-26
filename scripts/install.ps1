@@ -8,8 +8,10 @@
     Ajoute (ou synchronise) adscom-ia-pipeline comme submodule Git en
     agents/_pipeline-repo, aplatit 01-design/*/ vers .claude/skills/,
     fusionne les agents/*.md de 02-passation-design-dev/ et
-    03-developpement/ vers .github/agents/, et cree agents/design-manifest/
-    et agents/journal.ndjson s'ils n'existent pas encore.
+    03-developpement/ vers .github/agents/, cree agents/design-manifest/
+    et agents/journal.ndjson s'ils n'existent pas encore, et copie
+    03-developpement/reference-blocks/ vers agents/reference-blocks/ lors
+    de la toute premiere installation (jamais ecrase ensuite).
     Le resultat (submodule + fichiers plats) doit ensuite etre committe
     normalement dans le repo du projet consommateur.
 
@@ -80,6 +82,16 @@ if (-not (Test-Path $manifestKeep)) {
 $journalPath = Join-Path $ProjectRoot "agents\journal.ndjson"
 if (-not (Test-Path $journalPath)) {
     New-Item -ItemType File -Path $journalPath | Out-Null
+}
+
+$refBlocksSrc = Join-Path $pipelineRepo "03-developpement\reference-blocks"
+$refBlocksDest = Join-Path $ProjectRoot "agents\reference-blocks"
+if ((Test-Path $refBlocksSrc) -and -not (Test-Path $refBlocksDest)) {
+    Write-Host "Copie initiale de reference-blocks/ vers $refBlocksDest ..."
+    Copy-Item $refBlocksSrc $refBlocksDest -Recurse
+}
+else {
+    Write-Host "agents/reference-blocks/ deja present, non ecrase (alimente le contenu manuellement)."
 }
 
 $commit = (git -C $pipelineRepo rev-parse --short HEAD).Trim()

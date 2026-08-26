@@ -67,7 +67,7 @@ Pour chaque page listée dans `design-manifest/index.json`, `unit = page:<slug>`
 Ne démarre qu'après confirmation humaine. Pour chaque bloc de chaque page, `unit = block:<page-slug>/<block-id>`, `iteration = 0` :
 
 1. `iteration += 1`. Écrire `loop_iteration_started`.
-2. Invoquer `dev` pour ce bloc — précise-lui l'`iteration` courante (source : MCP Figma live dès l'itération 1, Design Manifest PNG + `layout_order` en repère visuel complémentaire, cf. `dev.md`). Écrire `theming_applied`.
+2. Invoquer `dev` pour ce bloc — précise-lui l'`iteration` courante. À l'itération 1, `dev` mène le process complet en minimisant les appels Figma (détection cross-page, appel Figma oneshot, checklist avant codage — cf. `dev.md`) ; à partir de l'itération 2, transmettre le `gap` rapporté par `reviewer` pour que `dev` traite uniquement le point signalé (correctif ciblé, pas de re-scan complet, cf. `dev.md` section "itérations 2 à 4"). Écrire `theming_applied`.
 3. Invoquer `reviewer` avec **`phase: Theming`** et l'`unit` ciblée — fidélité maquette desktop/mobile, résolutions intermédiaires (RGAA/perf : agents dédiés futurs, hors périmètre pour l'instant).
 4. Écrire `review_verdict`.
 5. Si `APPROVED` : invoquer `contrib` pour qu'il enregistre la composition Gutenberg finale si le theming a modifié la structure des blocs (pas systématique — seulement "si besoin", à l'appréciation de `contrib`).
