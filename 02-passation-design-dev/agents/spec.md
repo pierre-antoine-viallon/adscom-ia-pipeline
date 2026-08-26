@@ -50,7 +50,7 @@ Invoqué manuellement par l'humain (CP). **N'exige pas que `01-design` ait été
    - **Mobile** : comparer d'abord la structure mobile (`get_metadata`) à la structure desktop. Si les sections/contenus sont identiques (cas observé en pratique : même sections, même ordre, mêmes textes, seule la mise en page change) — ne pas ré-extraire le contenu, se contenter de mapper chaque section à son `id` mobile équivalent (champ `id_mobile`) et de capturer la capture d'écran mobile. Ne ré-extraire le contenu mobile via `get_design_context` que si une vraie divergence de contenu est détectée.
 4. **Tokens** : extraire directement les collections de variables Figma (`Color Primitives`, `Color`, `Typography Primitives`, `Typography`, `Size`) via `get_variable_defs`, puis dériver la correspondance (nom de variable Bootstrap probable, alias `$primary`/`$secondary`, slug Gutenberg) en appliquant les règles déjà documentées dans `.claude/skills/07-mapping-design-system/assets/tokens-bootstrap.md` et `sds-collections.md` — mêmes fichiers de référence que ceux lus par les skills Claude `07`/`09`/`14` de l'ancien pipeline, pour ne pas dupliquer la méthode. **`09-sync-sds-bootstrap` n'existe plus dans `01-design/` de ce repo** (déplacé en Passation, voir `sds-bootstrap.md`, qui consomme le `tokens.json` produit ici) — ne jamais s'attendre à ce que son ancienne sortie existe déjà.
 5. Si le quota MCP Figma est atteint en cours d'extraction : basculer sur les captures d'écran déjà disponibles (`export-assets/`) plutôt que d'inventer du contenu, et noter explicitement dans `index.json` (`tools_status`) que l'extraction est partielle / à compléter.
-6. **Télécharger les assets réels** (photos, icônes, logos, shapes) référencés par les URLs retournées par `get_design_context` — ces URLs expirent sous 7 jours côté Figma, ne jamais les laisser telles quelles dans le manifest. Organiser sous `design-manifest/assets/` avec la convention déjà utilisée par l'équipe design : `formes/`, `icones/`, `logos/` à la racine (assets partagés/réutilisés à travers les pages — dédupliquer si la même icône revient sur plusieurs boutons/liens), `Pages/<nom-frame-figma>/` pour les photos propres à une page. Écrire `design-manifest/assets/index.json` en regard (fichier, section d'origine, nom Figma).
+6. **Assets graphiques (photos/formes/icônes/logos) : jamais toi-même.** Tu ne télécharges rien via les URLs de `get_design_context` (pipeline `download_assets` abandonné, voir `01-design/11-export-assets`) — c'est l'**humain designer** qui dépose manuellement, dans `design-manifest/assets/`, le zip exporté depuis la page "Export" de Figma (export WebP/SVG via plugin, cf. `01-design/11-export-assets`), dézippé tel quel : `formes/`, `icones/`, `logos/` à la racine (assets partagés/réutilisés à travers les pages), `pages/<slug>/` pour les photos propres à une page (même slug que `pages/<slug>.json`). Ton rôle se limite à **vérifier la présence** de ce dossier avant de finaliser le manifest (si absent au moment de la génération, le noter dans `index.json` comme `assets_status: "pending"` plutôt que d'écrire un `assets_folder` invalide) et à écrire `design-manifest/assets/index.json` en regard (fichier, section d'origine, nom Figma) une fois le dépôt confirmé.
 7. Écrire `design-manifest/index.json`, un fichier par page sous `design-manifest/pages/<slug>.json`, et `design-manifest/tokens.json`.
 
 ## Format de sortie
@@ -72,10 +72,10 @@ Invoqué manuellement par l'humain (CP). **N'exige pas que `01-design` ait été
       "screenshot_desktop": "screenshot/home.png",
       "screenshot_mobile": "screenshot/mobile/home.png",
       "manifest_file": "pages/home.json",
-      "assets_folder": "assets/Pages/<nom-frame-figma>/"
+      "assets_folder": "assets/pages/<slug>/"
     }
   ],
-  "assets": { "index": "assets/index.json", "structure": "assets/{formes,icones,logos}/ + assets/Pages/<slug>/" }
+  "assets": { "index": "assets/index.json", "structure": "assets/{formes,icones,logos}/ + assets/pages/<slug>/", "deposited_by": "humain designer (manuel)" }
 }
 ```
 

@@ -67,6 +67,8 @@ Un seul appel `get_design_context` sur le nœud du bloc et l'ensemble de ses sou
 
 Mapper systématiquement les variables Figma retournées vers les variables Sass réelles de **`_variables.scss`** du thème (produit par `sds-bootstrap` à partir de `design-manifest/tokens.json`, puis appliqué au thème par `init`) — jamais des valeurs brutes si un équivalent existe, jamais ré-estimées visuellement, jamais re-dérivées à la main de `tokens.json` pendant la boucle.
 
+**Assets graphiques (formes/icônes/logos)** : si le bloc référence un de ces éléments, le fichier source vient de `design-manifest/assets/formes/`, `assets/icones/` ou `assets/logos/` (déposés manuellement par le designer, jamais téléchargés par toi) — jamais de `assets/pages/<slug>/`, réservé aux photos de contenu que `contrib` intègre. Copier le fichier dans le dossier assets du thème (ex. `wordpress/wp-content/themes/<theme>/assets/img/`) et le référencer en SCSS (`background-image`, `mask`, `<img>` de logo...). Si le fichier attendu est absent du dossier au moment du theming, le signaler à l'Orchestrator (`missing_data`) plutôt que d'utiliser un export Figma live à la place — ce dossier est la seule source pour ces trois catégories.
+
 Second appel `get_design_context` autorisé mais restreint : seulement si l'auto-checklist (étape 4) révèle un point précis resté ambigu (nœud sans info suffisante, variante non couverte), ciblé sur ce nœud/sous-nœud précis. Ne jamais relancer un scan large "au cas où".
 
 ### Étape 2 — Détection de répétition (listes, cards, grilles)
@@ -161,6 +163,7 @@ Pour `global:header`/`global:footer`, même format, `unit` vaut `"global:header"
 - Le second appel Figma de l'étape 1, et l'appel ciblé des itérations 2-4, restent l'exception : toujours justifiés par un point précis (checklist ou `gap` de `reviewer`), jamais un réflexe systématique ni un scan large "au cas où".
 - Ne jamais introduire de valeur de style brute quand une variable `_variables.scss` existe pour ce cas. Si `_variables.scss` n'a pas d'équivalent exact pour une valeur de la maquette, le documenter comme tel (valeur locale, pas un token) plutôt que de forcer un mapping approximatif silencieusement.
 - Ne jamais toucher au contenu Gutenberg (texte, structure de blocs de contenu) — c'est le rôle de `contrib`. Si le theming révèle qu'une restructuration de blocs est nécessaire, le signaler à l'Orchestrator pour qu'il invoque `contrib` en conséquence, ne pas le faire toi-même.
+- Ne jamais piocher dans `design-manifest/assets/pages/<slug>/` — ce sont des photos de contenu, réservées à `contrib`.
 - Ne jamais toucher au contenu ou à la structure des menus d'entête/footer (libellés, cibles, ordre des entrées) — même logique que pour le contenu Gutenberg, c'est `contrib` qui les construit. Ton rôle sur l'entête/footer se limite au style et au comportement visuel.
 - Toujours vérifier visuellement après chaque ajustement, jamais à l'aveugle sur la seule lecture du code.
 - Respecter les consignes projet déjà actées ailleurs quand elles existent (ex. ne pas toucher à une règle CSS explicitement mise hors scope par l'humain) — vérifier `brief-projet.md`/les notes de theming existantes avant de modifier une règle partagée.

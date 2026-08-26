@@ -52,6 +52,8 @@ IA Spec ajoute aussi, par section, un champ `layout_order` pour capturer l'ordre
 
 Son modèle de référence vit dans `02-passation-design-dev/agents/spec.md` (§9) — copié dans le `.github/agents/` du projet WordPress par le script d'installation, pas exécuté depuis ce repo.
 
+**Révision (2026-08-26) — assets graphiques, dépôt manuel** : `design-manifest/assets/` accueille les exports Figma (photos/formes/icônes/logos), déposés **manuellement par l'humain designer** — jamais téléchargés par `spec` (le pipeline `download_assets` via URL est abandonné, cf. `01-design/11-export-assets`). Structure calée sur l'export réel (dézippage direct, aucun tri manuel requis) : `formes/`, `icones/`, `logos/` à la racine (assets réutilisables au niveau du thème, lus par `dev`), `pages/<slug>/` (photos de contenu propres à une page, même slug que `pages/<slug>.json`, lues par `contrib`). `spec` se limite à vérifier la présence du dossier et à écrire `assets/index.json` en regard — jamais à le peupler lui-même.
+
 ---
 
 ## 3. Boucles Contribution et Theming — gestion des itérations
@@ -168,6 +170,10 @@ mon-projet-wp/
 ├── agents/                    ← tout ce qui n'a pas de chemin imposé par un outil
 │   ├── _pipeline-repo/        ← submodule adscom-ia-pipeline (source de vérité)
 │   ├── design-manifest/       ← livrable write-once de l'agent spec (§2)
+│   │   ├── index.json / tokens.json / pages/<slug>.json / screenshot/
+│   │   └── assets/            ← dépôt MANUEL par l'humain designer (§2)
+│   │       ├── formes/ icones/ logos/   ← lus par dev (theming)
+│   │       └── pages/<slug>/            ← lus par contrib (photos)
 │   └── journal.ndjson         ← journal d'exécution de l'Orchestrator (§8)
 └── wordpress/                 ← sources WordPress classiques, isolées du reste
     ├── wp-content/
