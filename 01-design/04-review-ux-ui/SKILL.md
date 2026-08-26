@@ -1,3 +1,8 @@
+---
+name: 04-review-ux-ui
+description: Analyse une page Figma et produit un rapport de révision UX/UI priorisé.
+---
+
 # Skill : review-ux-ui
 
 ## Rôle

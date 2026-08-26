@@ -1,3 +1,9 @@
+---
+name: 12-documentation
+description: Génère la documentation technique du projet à partir des rapports produits par les skills précédents.
+---
+
+
 # Skill — documentation
 
 ## Rôle

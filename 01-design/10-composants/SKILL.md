@@ -1,3 +1,9 @@
+---
+name: 10-composants
+description: Détecte les patterns répétés dans une maquette Figma et les transforme en composants avec variantes et propriétés exposées. 
+---
+
+
 # Skill : composants
 
 ## Rôle

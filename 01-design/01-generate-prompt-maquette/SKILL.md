@@ -1,3 +1,8 @@
+---
+name: 01-generate-prompt-maquette
+description: Génère un prompt structuré pour créer une maquette conforme au brief projet
+---
+
 # Skill — generate-prompt-maquette
 
 ## Rôle

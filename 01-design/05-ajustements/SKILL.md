@@ -1,3 +1,9 @@
+---
+name: 05-ajustements
+description: Guide le designer pour appliquer les corrections issues du rapport UX/UI, en mode dialogue.
+---
+
+
 # Skill : ajustements
 
 ## Rôle

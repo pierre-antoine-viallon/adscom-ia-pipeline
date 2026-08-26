@@ -1,3 +1,8 @@
+---
+name: 00-brief-onboarding
+description: Guide l'utilisateur pour constituer le brief de contexte du projet et génère un document structuré selon le format canonique ads-COM.
+---
+
 # Skill : brief-onboarding
 
 ## Rôle

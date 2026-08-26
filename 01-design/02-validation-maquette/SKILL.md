@@ -1,3 +1,8 @@
+---
+name: 02-validation-maquette
+description: Valide qu'une maquette livrée est conforme au brief projet, au design system SDS et aux contraintes Bootstrap 5
+---
+
 # Skill — validation-maquette
 
 ## Rôle

@@ -1,3 +1,9 @@
+---
+name: 13-livraison
+description: Prépare et vérifie le dossier de livraison final, en suivant une checklist de complétude et de cohérence des livrables.
+---
+
+
 # Skill — livraison
 
 ## Rôle

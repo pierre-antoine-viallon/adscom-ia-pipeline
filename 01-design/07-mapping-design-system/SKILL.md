@@ -1,3 +1,9 @@
+---
+name: 07-mapping-design-system
+description: Analyse un fichier Figma et produit un plan de mise à jour priorisé pour le design system SDS
+---
+
+
 # Skill : mapping-design-system
 
 ## Rôle

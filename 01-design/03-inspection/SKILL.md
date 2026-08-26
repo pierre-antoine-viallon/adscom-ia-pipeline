@@ -1,3 +1,8 @@
+---
+name: 03-inspection
+description: Inspecte un fichier Figma et produit un rapport structuré sur les pages, calques, variables, composants et styles.
+---
+
 # Skill : inspection
 
 ## Rôle

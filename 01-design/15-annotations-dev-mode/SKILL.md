@@ -1,3 +1,9 @@
+---
+name: 15-annotations-dev-mode
+description: Prépare la phase de développement en posant des annotations Dev Mode Figma sur les nœuds, visibles par le développeur dans l'onglet Dev Mode.
+---
+
+
 # Skill : annotations-dev-mode
 
 ## Rôle

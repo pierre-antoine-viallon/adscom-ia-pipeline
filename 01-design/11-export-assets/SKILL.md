@@ -1,3 +1,8 @@
+---
+name: 11-export-assets
+description: Prépare l'export des assets d'une page ou d'un périmètre Figma en générant un prompt Figma AI paramétré.
+---
+
 # Skill : export-assets
 
 ## Rôle

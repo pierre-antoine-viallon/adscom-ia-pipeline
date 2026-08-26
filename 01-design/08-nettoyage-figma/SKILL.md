@@ -1,3 +1,9 @@
+---
+name: 08-nettoyage-figma
+description: Exécute des opérations de nettoyage destructives directement dans un fichier Figma, en suivant les rapports de mapping du design system SDS.
+---
+
+
 # Skill : nettoyage-figma
 
 ## Rôle

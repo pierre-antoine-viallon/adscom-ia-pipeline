@@ -1,3 +1,9 @@
+---
+name: 14-sync-sds-depuis-maquette
+description: Description of what the skill does and when to use it
+---
+
+  
 # Skill : sync-sds-depuis-maquette
 
 ## Rôle

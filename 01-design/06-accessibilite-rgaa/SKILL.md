@@ -1,3 +1,9 @@
+---
+name: 06-accessibilite-rgaa
+description: Audite une maquette Figma pour vérifier la conformité aux critères RGAA 4.1 et produit un rapport de corrections guidées.
+---
+
+
 # Skill : accessibilite-rgaa
 
 ## Rôle
