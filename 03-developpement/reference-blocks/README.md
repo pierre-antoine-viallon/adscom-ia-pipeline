@@ -8,10 +8,23 @@ Le contenu de ce dossier doit être copié manuellement depuis des projets déj�
 
 ## Format attendu
 
-Un sous-dossier par bloc, nommé de façon descriptive (ex. `card-actualite/`, `hero-simple/`, `footer-complexe/`), contenant au minimum :
+Un sous-dossier par bloc, nommé de façon descriptive (ex. `card-actualite-badge/`), contenant au minimum :
 
-- le markup HTML final du bloc (tel que généré par `contrib` sur le projet source) ;
-- le SCSS correspondant, déjà validé par `reviewer` sur ce projet.
+- `markup.html` — le markup HTML final du bloc (tel que généré par `contrib` sur le projet source) ;
+- `block.scss` — le SCSS correspondant, déjà validé par `reviewer` sur ce projet.
+
+## Contenu actuel
+
+Quatre exemples issus du projet **RJAC** (résidences-jeunes-acacias-colombier.fr, page d'accueil) :
+
+| Dossier | Catégorie | Ce qu'il illustre |
+|---|---|---|
+| `stat-simple/` | simple | Structure basique, pas de variante (`rjac-audience__stat`) |
+| `card-service-etats/` | variantes/états | État hover (desktop) + variante responsive de hauteur (`service-card`) |
+| `card-actualite-badge/` | variantes/états + répétition | Modificateur en classe Bootstrap générique (`badge-primary-dark`), état hover, instance de référence pour un bloc répété 3x dans la page source |
+| `grille-logements-responsive/` | responsive complexe | Grille de colonnes Bootstrap qui se réarrange sous `lg`, tailles fluides via `clamp()` |
+
+**Point de vigilance repéré dans le code source** (`grille-logements-responsive/block.scss`) : `.logement-card` utilise `background: #FFFFFF` en valeur brute plutôt qu'un token — laissé tel quel car c'est du code réel et validé sur RJAC, mais **ne pas reproduire cette imprécision** sur un nouveau projet : `dev.md` interdit une valeur brute dès qu'un équivalent existe dans `_variables.scss` du thème cible ; ce cas montre juste qu'un exemple réel n'est pas nécessairement irréprochable sur ce point précis.
 
 ## Diversité attendue (2-3 blocs)
 
