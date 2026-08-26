@@ -1,0 +1,51 @@
+// Source : projet RJAC, home.scss (lignes 766-813) — bloc responsive
+// complexe : grille de colonnes Bootstrap (logement-card) qui se
+// réarrange en dessous de lg, tailles de police fluides via clamp().
+// Voir README.md du dossier parent pour la provenance.
+
+.logements-section {
+  h2 {
+    margin-block: 4rem 0.75rem;
+  }
+
+  .logements-row {
+    margin-block: 4rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .logement-card {
+    background: #FFFFFF;
+    border: 0.666667px solid $gray-300;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+
+    img {
+      height: 14rem;
+      object-fit: cover;
+      border-radius: 2rem 2rem 0 0;
+    }
+  }
+
+  .logement-card-body {
+    padding: 1.5rem;
+
+    p {
+      margin-bottom: 0;
+    }
+
+    h3 {
+      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .logements-section .logements-row {
+    margin-block: 0 2rem;
+  }
+  .logements-section .logement-card-body p {
+    font-size: $font-size-sm;
+  }
+}

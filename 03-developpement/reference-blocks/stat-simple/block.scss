@@ -1,0 +1,41 @@
+// Source : projet RJAC, home.scss (lignes 627-658, 685-687) — bloc simple,
+// pas de variante. Voir README.md du dossier parent pour la provenance.
+
+.rjac-audience__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rjac-audience__stat {
+  flex: 1;
+  min-width: 90px;
+  background: $gray-100;
+  border-radius: 1.25rem;
+  padding: 1rem 0.875rem;
+  text-align: center;
+}
+
+.rjac-audience__stat-value {
+  font-family: $headings-font-family;
+  font-size: clamp(1.25rem, 5vw, 2.5rem);
+  font-weight: 600;
+  color: $primary;
+  line-height: 120%;
+  letter-spacing: -2%;
+  margin-bottom: 0;
+  outline: none;
+}
+
+.rjac-audience__stat-label {
+  font-size: $font-size-sm;
+  line-height: 140%;
+  outline: none;
+  margin-bottom: 0;
+}
+
+@include media-breakpoint-down(lg) {
+  .rjac-audience__stat {
+    background: $white;
+  }
+}

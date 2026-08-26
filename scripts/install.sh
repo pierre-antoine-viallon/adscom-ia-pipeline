@@ -6,8 +6,10 @@
 # Ajoute (ou synchronise) adscom-ia-pipeline comme submodule Git en
 # agents/_pipeline-repo, aplatit 01-design/*/ vers .claude/skills/,
 # fusionne les agents/*.md de 02-passation-design-dev/ et
-# 03-developpement/ vers .github/agents/, et cree agents/design-manifest/
-# et agents/journal.ndjson s'ils n'existent pas encore.
+# 03-developpement/ vers .github/agents/, cree agents/design-manifest/
+# et agents/journal.ndjson s'ils n'existent pas encore, et copie
+# 03-developpement/reference-blocks/ vers agents/reference-blocks/ lors
+# de la toute premiere installation (jamais ecrase ensuite).
 # Le resultat (submodule + fichiers plats) doit ensuite etre committe
 # normalement dans le repo du projet consommateur.
 #
@@ -69,6 +71,15 @@ mkdir -p "$MANIFEST_DEST"
 [[ -f "$MANIFEST_DEST/.gitkeep" ]] || touch "$MANIFEST_DEST/.gitkeep"
 JOURNAL_PATH="$PROJECT_ROOT/agents/journal.ndjson"
 [[ -f "$JOURNAL_PATH" ]] || touch "$JOURNAL_PATH"
+
+REFBLOCKS_SRC="$PIPELINE_REPO/03-developpement/reference-blocks"
+REFBLOCKS_DEST="$PROJECT_ROOT/agents/reference-blocks"
+if [[ -d "$REFBLOCKS_SRC" && ! -d "$REFBLOCKS_DEST" ]]; then
+  echo "Copie initiale de reference-blocks/ vers $REFBLOCKS_DEST ..."
+  cp -r "$REFBLOCKS_SRC" "$REFBLOCKS_DEST"
+else
+  echo "agents/reference-blocks/ deja present, non ecrase (alimente le contenu manuellement)."
+fi
 
 COMMIT="$(git -C "$PIPELINE_REPO" rev-parse --short HEAD)"
 echo ""

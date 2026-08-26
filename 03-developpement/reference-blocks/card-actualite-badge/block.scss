@@ -1,0 +1,54 @@
+// Source : projet RJAC, theme.scss (lignes 1429-1486) — bloc avec état
+// hover (soulignement du titre) et une variante responsive du ratio
+// d'image. `badge-primary-dark` est une classe Bootstrap générique
+// utilisée en modificateur, pas une classe propre à `.carte-article`.
+// Voir README.md du dossier parent pour la provenance.
+
+.carte-article {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+// État hover
+.carte-article:hover .carte-article__titre {
+  text-decoration: underline;
+}
+
+.carte-article__image {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 364 / 416;
+  margin-bottom: 1rem;
+}
+
+.carte-article__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.carte-article__contenu {
+  padding-inline: .75rem;
+}
+
+.carte-article__titre {
+  font-weight: 500;
+  color: $body-color;
+  margin-top: 0.375rem;
+  font-size: $font-size-lg;
+  line-height: 120%;
+}
+
+// Variante responsive : ratio d'image différent en dessous de md
+@include media-breakpoint-down(md) {
+  .mes-cards-latest-posts {
+    display: flex;
+    flex-direction: column;
+  }
+  .carte-article__image {
+    aspect-ratio: 351 / 271;
+  }
+}
