@@ -10,7 +10,7 @@ Pipeline de production agentique ads-COM pour des sites WordPress (Drupal en sec
 
 ## Structure
 
-- `01-design/<nn-nom>/SKILL.md` — 16 skills Claude Code, identiques à `figma-mcp-claude-skills`, invoqués via `/<nn-nom>` une fois installés à plat dans `.claude/skills/` d'un projet. **Ne jamais imbriquer davantage** : la découverte Claude Code n'est pas récursive.
+- `01-design/<nn-nom>/SKILL.md` — 15 skills Claude Code, identiques à `figma-mcp-claude-skills`, invoqués via `/<nn-nom>` une fois installés à plat dans `.claude/skills/` d'un projet. **Ne jamais imbriquer davantage** : la découverte Claude Code n'est pas récursive.
 - `02-passation-design-dev/agents/spec.md` et `03-developpement/agents/*.md` — modèles d'agents GitHub Copilot (frontmatter YAML `name`/`description`/`prompt`/`tools`/`mcpServers`), installés dans `.github/agents/` d'un projet.
 - `scripts/install.ps1`, `scripts/install.sh` — mécanisme d'installation (clone temporaire + copie/aplatissement + marqueur `.source-version`, voir `README.md`).
 

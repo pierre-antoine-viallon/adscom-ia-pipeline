@@ -1,8 +1,16 @@
 # Bootstrap 5 — Tokens et correspondances SDS
 
-> Référence : Bootstrap 5.3.x (variables CSS + Sass)
+> **Référence : Bootstrap 5.3.x** (variables CSS + Sass).
 > Ce document mappe les tokens Bootstrap 5 vers les variables SDS sémantiques.
 > Les valeurs hex sont les défauts Bootstrap — elles peuvent être surchargées par la charte client.
+>
+> ⚠️ **Version cible du projet** : sur une version antérieure à 5.3, certaines variables listées ici
+> n'existent pas encore. Introduites après 5.0 (à ne pas écrire sur une 5.0.x / 5.1.x sans vérifier) :
+> le système de custom properties `--bs-*` de couleurs (5.1→5.3), `$body-secondary-color` /
+> `$body-tertiary-color` / `$body-secondary-bg` / `$body-tertiary-bg` (5.3),
+> `$focus-ring-width` / `$focus-ring-color` (5.3), les variables de mode sombre.
+> `sds-bootstrap` doit lire la version réelle (`tokens.json._meta.bootstrap_target`) et n'écrire que
+> les variables disponibles — cf. `02-passation-design-dev/agents/sds-bootstrap.md` étape 2.
 
 ---
 
