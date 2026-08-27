@@ -33,16 +33,31 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# git refuse d'operer sur un depot dont il ne "possede" pas le dossier
+# (partages reseau, //wsl$/, volumes montes...). Exception ciblee plutot
+# que de laisser le script echouer a mi-parcours.
+add_git_safe_directory() {
+  local abs
+  abs="$(cd "$1" 2>/dev/null && pwd)" || return 0
+  if ! git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$abs"; then
+    git config --global --add safe.directory "$abs" 2>/dev/null || true
+  fi
+}
+
+add_git_safe_directory "$PROJECT_ROOT"
+
 PIPELINE_REPO="$PROJECT_ROOT/agents/_pipeline-repo"
 
 if [[ -d "$PIPELINE_REPO/.git" ]]; then
   echo "Submodule agents/_pipeline-repo existant, mise a jour vers $REF..."
+  add_git_safe_directory "$PIPELINE_REPO"
   git -C "$PIPELINE_REPO" fetch --quiet origin "$REF"
   git -C "$PIPELINE_REPO" checkout --quiet FETCH_HEAD
 else
   echo "Ajout du submodule agents/_pipeline-repo ($REPO_URL@$REF)..."
   mkdir -p "$PROJECT_ROOT/agents"
   git -C "$PROJECT_ROOT" submodule add --quiet "$REPO_URL" "agents/_pipeline-repo"
+  add_git_safe_directory "$PIPELINE_REPO"
   git -C "$PIPELINE_REPO" fetch --quiet origin "$REF"
   git -C "$PIPELINE_REPO" checkout --quiet FETCH_HEAD
 fi
@@ -53,8 +68,11 @@ mkdir -p "$SKILLS_DEST" "$AGENTS_DEST"
 
 echo "Copie des skills Claude Code (01-design/) vers $SKILLS_DEST ..."
 for skill_dir in "$PIPELINE_REPO"/01-design/*/; do
-  # name="$(basename "$skill_dir")"
-  cp -r "$skill_dir" "$SKILLS_DEST/"
+  name="$(basename "$skill_dir")"
+  # Purge prealable pour une resync propre (parite avec install.ps1, ou
+  # Copy-Item -Recurse imbriquerait XX/XX au 2e passage).
+  rm -rf "${SKILLS_DEST:?}/$name"
+  cp -r "$skill_dir" "$SKILLS_DEST/$name"
 done
 
 echo "Fusion des agents Copilot vers $AGENTS_DEST ..."
@@ -72,6 +90,14 @@ mkdir -p "$MANIFEST_DEST"
 JOURNAL_PATH="$PROJECT_ROOT/agents/journal.ndjson"
 [[ -f "$JOURNAL_PATH" ]] || touch "$JOURNAL_PATH"
 
+# Le projet consommateur est generalement servi sous Linux : forcer LF pour
+# eviter d'introduire des CRLF dans le SCSS/PHP/JS depuis un poste Windows.
+GITATTRIBUTES="$PROJECT_ROOT/.gitattributes"
+if [[ ! -f "$GITATTRIBUTES" ]]; then
+  printf '* text=auto eol=lf\n' > "$GITATTRIBUTES"
+  echo "Cree .gitattributes (eol=lf)."
+fi
+
 REFBLOCKS_SRC="$PIPELINE_REPO/03-developpement/reference-blocks"
 REFBLOCKS_DEST="$PROJECT_ROOT/agents/reference-blocks"
 if [[ -d "$REFBLOCKS_SRC" && ! -d "$REFBLOCKS_DEST" ]]; then
@@ -81,7 +107,13 @@ else
   echo "agents/reference-blocks/ deja present, non ecrase (alimente le contenu manuellement)."
 fi
 
-COMMIT="$(git -C "$PIPELINE_REPO" rev-parse --short HEAD)"
+COMMIT="$(git -C "$PIPELINE_REPO" rev-parse --short HEAD 2>/dev/null || true)"
 echo ""
+if [[ -z "$COMMIT" ]]; then
+  COMMIT="inconnu"
+  echo "AVERTISSEMENT : impossible de lire le commit du submodule (git -C a echoue)." >&2
+  echo "Si le message parlait de 'dubious ownership', lancer :" >&2
+  echo "  git config --global --add safe.directory <chemin-absolu-du-projet>" >&2
+fi
 echo "Installe depuis $REF (commit $COMMIT)."
-echo "Verifiez le diff (git status) puis committez agents/, .claude/skills/, .github/agents/ et .gitmodules."
+echo "Verifiez le diff (git status) puis committez agents/, .claude/skills/, .github/agents/, .gitattributes et .gitmodules."

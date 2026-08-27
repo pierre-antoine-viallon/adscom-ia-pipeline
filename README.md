@@ -10,7 +10,7 @@ Inspiré de la plateforme de skills communautaire : [figma.com/community/skills]
 
 ```
 00-setup/                    ← amorçage projet (BDD, Git) — documentaire pour l'instant, pas de skill
-01-design/                   ← 16 skills Claude Code (identiques à figma-mcp-claude-skills)
+01-design/                   ← 15 skills Claude Code (identiques à figma-mcp-claude-skills)
 02-passation-design-dev/     ← agents Copilot "IA Spec" (Design Manifest) + "sds-bootstrap" (tokens → SCSS)
 03-developpement/            ← agents Copilot Init/Contribution/Theming + Orchestrator
 ```
@@ -45,7 +45,9 @@ Pour figer une version précise plutôt que `main` : `install.ps1 -Ref v1.2.0` (
 
 ---
 
-## Les 16 skills Claude Code (`01-design/`)
+## Les 15 skills Claude Code (`01-design/`)
+
+> 15 dossiers : `00`–`15` **sans le `09`** (`sync-sds-bootstrap` déplacé en Passation, cf. `02-passation-design-dev/`). Les numéros ne sont jamais réutilisés ni décalés.
 
 | # | Skill | Commande | Mode Figma | Rôle |
 |---|---|---|---|---|
