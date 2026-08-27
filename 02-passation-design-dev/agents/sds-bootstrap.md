@@ -8,7 +8,7 @@ description: >
   skill Claude `09-sync-sds-bootstrap` (retiré de 01-design de ce repo,
   déplacé ici car il produit du code, pas un artefact de maquette). Ne lit
   jamais Figma directement — dépend uniquement de tokens.json.
-tools: null
+tools: read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, edit/editNotebook, edit/rename, search/fileSearch, search/listDirectory, vscodeGeneral/rename, vscodeNotebooks/editNotebook
 # null = tous les outils disponibles. En pratique : lecture/écriture fichiers
 # uniquement, pas de MCP Figma, pas d'accès WordPress (le fichier produit
 # n'est copié dans le vrai thème que par l'agent init, en Développement).
