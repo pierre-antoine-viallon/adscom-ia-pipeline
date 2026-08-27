@@ -54,7 +54,9 @@ IA Spec ajoute aussi, par section, un champ `layout_order` pour capturer l'ordre
 
 Son modèle de référence vit dans `02-passation-design-dev/agents/spec.md` (§9) — copié dans le `.github/agents/` du projet WordPress par le script d'installation, pas exécuté depuis ce repo.
 
-**Révision (2026-08-26) — assets graphiques, dépôt manuel** : `design-manifest/assets/` accueille les exports Figma (photos/formes/icônes/logos), déposés **manuellement par l'humain designer** — jamais téléchargés par `spec` (le pipeline `download_assets` via URL est abandonné, cf. `01-design/11-export-assets`). Structure calée sur l'export réel (dézippage direct, aucun tri manuel requis) : `formes/`, `icones/`, `logos/` à la racine (assets réutilisables au niveau du thème, lus par `dev`), `pages/<slug>/` (photos de contenu propres à une page, même slug que `pages/<slug>.json`, lues par `contrib`). `spec` se limite à vérifier la présence du dossier et à écrire `assets/index.json` en regard — jamais à le peupler lui-même.
+**Révision (2026-08-26) — assets graphiques, dépôt manuel** : `agents/design-manifest/assets/` accueille les exports Figma (photos/formes/icônes/logos), déposés **manuellement par l'humain designer** — jamais téléchargés par `spec` (le pipeline `download_assets` via URL est abandonné, cf. `01-design/11-export-assets`). Structure calée sur l'export réel (dézippage direct, aucun tri manuel requis) : `formes/`, `icones/`, `logos/` à la racine (assets réutilisables au niveau du thème, lus par `dev`), `pages/<slug>/` (photos de contenu propres à une page, même slug que `pages/<slug>.json`, lues par `contrib`).
+
+**Précisé au 1er test (2026-08-27)** — `spec` cadre le dépôt sans jamais y toucher : (a) il **crée l'arborescence vide** (`formes/`, `icones/`, `logos/` + un `pages/<slug>/` par slug généré, `.gitkeep` partout) ; (b) il renseigne un bloc **`assets_expected`** par page (noms de calques Figma repérés + type + dossier cible) ; (c) il **émet une consigne explicite à l'humain** en fin de rapport (chemin absolu, règle de tri partagés/par-page, liste des slugs, format = zip de la page « Export » dézippé) ; (d) il **vérifie la présence** du dépôt : `assets_status: "pending"` tant que le dossier ne contient que les `.gitkeep`, puis écriture de `assets/index.json` et bascule en `ok` après confirmation. Détail dans `02-passation-design-dev/agents/spec.md` étape 6.
 
 ---
 
@@ -193,9 +195,9 @@ mon-projet-wp/
 │   ├── design-manifest/       ← livrable write-once de l'agent spec (§2, régénérable en delta cf. §2 bis)
 │   │   ├── index.json / tokens.json / pages/<slug>.json (champ manifest_version) / screenshot/
 │   │   ├── delta-report-<date>.md   ← rapport + plan d'action d'un rejeu en delta (§2 bis)
-│   │   └── assets/            ← dépôt MANUEL par l'humain designer (§2)
-│   │       ├── formes/ icones/ logos/   ← lus par dev (theming)
-│   │       └── pages/<slug>/            ← lus par contrib (photos)
+│   │   └── assets/            ← arborescence créée vide par spec, remplie MANUELLEMENT par le designer (§2)
+│   │       ├── formes/ icones/ logos/   ← assets partagés, lus par dev (theming)
+│   │       └── pages/<slug>/            ← photos propres à une page, lues par contrib
 │   └── journal.ndjson         ← journal d'exécution de l'Orchestrator (§8)
 └── wordpress/                 ← sources WordPress (créé et instancié par l'agent init, phase 03 — pas par le script d'installation)
     ├── wp-content/
