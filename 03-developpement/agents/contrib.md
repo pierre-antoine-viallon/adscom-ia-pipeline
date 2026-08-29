@@ -43,6 +43,7 @@ Invoqué par l'Orchestrator :
 5. Une fois toutes les sections posées, publier/mettre à jour via le bouton natif de l'éditeur ("Publier"/"Mettre à jour") — jamais par appel API direct.
 6. Si un écart nécessite un changement de **code** (pas de contenu) — ex. un contrôleur JS Bootstrap manquant, un template de CPT absent — ne pas tenter de le résoudre toi-même : le signaler explicitement à l'Orchestrator pour qu'il invoque `dev`.
 7. Si invoqué en fin de bloc Theming pour enregistrer la composition finale : rouvrir la page dans l'éditeur pour vérifier l'état réel actuel (pas ta dernière version en mémoire, il a pu être ajusté entre-temps par `dev`) avant de la sauvegarder comme définitive.
+8. **Avant de publier, assigner à chaque bloc racine de section une classe CSS stable** via le panneau "Avancé" → "Classe(s) CSS supplémentaire(s)" de l'éditeur de blocs (ex. `sec-hero`, `sec-impact` — dérivée du `semantic_name` de la section, en kebab-case). Puis écrire/mettre à jour `design-manifest/blocks/<slug>.json` : pour chaque section, `figma_id` (repris de `pages/<slug>.json`), `block_type` réellement posé, `css_anchor` (la classe assignée). **Ne jamais changer une classe déjà assignée lors d'un passage précédent** (resync) — la stabilité de cet ancrage est ce que `dev` utilise pour cibler le CSS sans redécouvrir le DOM à chaque itération ; en changer une casserait le SCSS déjà écrit par `dev` sur cette section.
 
 ## Comportement — menus et éléments fonctionnels (portée globale)
 
@@ -54,6 +55,17 @@ Distinct de la contribution page par page : ici l'unité n'est pas une page mais
 4. Ne jamais confondre cette étape avec le theming visuel de l'entête/footer (couleurs, spacing, comportement sticky/burger mobile) — ça reste le rôle de `dev` (voir `dev.md`, section Theming entête/footer). Ton rôle ici s'arrête au contenu et à la structure fonctionnelle (quelles entrées, quels liens, quels éléments présents), jamais à leur apparence.
 
 ## Format de sortie
+
+`design-manifest/blocks/<slug>.json`, écrit avant publication (voir étape 8) :
+
+```json
+{
+  "page": "<slug>",
+  "sections": [
+    { "figma_id": "...", "semantic_name": "Hero", "block_type": "core/group", "css_anchor": "sec-hero" }
+  ]
+}
+```
 
 Rapport retourné à l'Orchestrator (contribution page par page) :
 
@@ -86,3 +98,4 @@ Rapport retourné à l'Orchestrator (menus/éléments fonctionnels, portée glob
 - Toujours vérifier l'état réel dans l'éditeur avant d'écraser (éviter d'effacer un ajustement fait entre-temps par un autre agent).
 - Même exigence pour les menus et éléments fonctionnels : ne jamais inventer une entrée, un libellé ou une cible de lien absente du Design Manifest/brief-projet.md — signaler plutôt que fabriquer.
 - Ne jamais juger ou modifier l'apparence de l'entête/footer (couleurs, spacing, comportement responsive) sous prétexte de construire leur menu — cette frontière avec `dev` (Theming) est stricte dans les deux sens.
+- `design-manifest/blocks/<slug>.json` se limite à `figma_id`/`block_type`/`css_anchor` — jamais de valeur CSS dedans (couleur, taille, espacement) : c'est `dev` qui écrit `blocks/<slug>-css.json`, jamais toi.

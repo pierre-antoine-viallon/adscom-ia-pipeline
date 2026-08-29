@@ -76,6 +76,27 @@ Son modèle de référence vit dans `02-passation-design-dev/agents/spec.md` (§
 
 ---
 
+## 2 ter. Mapping Figma CSS ↔ bloc Gutenberg (Contrib → dev, avant l'intégration CSS)
+
+**Problème** : au début de la boucle Theming, `dev` doit à chaque fois retrouver, pour un bloc donné, (a) à quel sélecteur/bloc Gutenberg réellement posé par `contrib` correspond une section Figma, et (b) les valeurs CSS exactes de cette section dans Figma. Aujourd'hui ce travail se fait en mémoire, à l'itération 1 de chaque bloc (§4, `dev.md` étapes 1 et 3) — rien n'est persisté, donc rien n'est réutilisable d'une itération à l'autre ni lors d'un rejeu en delta (§2 bis).
+
+**Décision (2026-08-29)** : formaliser ce travail en deux artefacts distincts sous `design-manifest/blocks/`, chacun avec un seul producteur — même invariant que le reste du pipeline (§2, §5) :
+
+| Fichier | Producteur | Contenu | Consommateur |
+|---|---|---|---|
+| `design-manifest/blocks/<slug>.json` | `contrib` | Pour chaque section de la page : `figma_id` (repris de `pages/<slug>.json`), `block_type` réellement posé (`core/group`, `core/columns`...), `css_anchor` — une classe CSS stable assignée par `contrib` via le panneau "Additional CSS class(es)" du bloc racine de la section, pour donner à `dev` un sélecteur fiable sans dépendre de la structure DOM générée par Gutenberg | `dev` (theming) |
+| `design-manifest/blocks/<slug>-css.json` | `dev` | Pour chaque section (clé = `figma_id`) : les valeurs CSS exactes extraites de Figma (couleurs mappées aux tokens `_variables.scss`, typographie, spacing/radius, `clamp()` calculés) — c'est la persistance des étapes 1 et 3 de `dev.md`, écrite **avant** l'étape 5 (codage SCSS), pas après | Itérations 2-4 du même bloc ; un futur rejeu en delta (§2 bis) |
+
+**Pourquoi deux fichiers et pas un seul écrit par `contrib` puis complété par `dev`** : un seul producteur par fichier, cohérent avec l'invariant déjà en place pour `design-manifest/assets/index.json` (spec) vs `design-manifest/assets/` (humain designer) — deux producteurs différents, deux fichiers différents, jamais une mutation croisée.
+
+**Pourquoi ce n'est pas `spec` qui produit ce mapping** (contrairement à une première ébauche posée sur le FigJam `Process et reflexion réalisation IA supervisé`, avant cette décision) : `spec` travaille en Passation, avant que `contrib` n'ait posé le moindre bloc Gutenberg réel — elle ne peut connaître que le `type` *pressenti* d'une section (déjà capturé dans `pages/<slug>.json`), jamais le bloc réellement instancié ni son sélecteur CSS. Le mapping ne peut exister qu'une fois la Contribution faite, et les valeurs CSS ne peuvent être extraites que par `dev`, seul agent Développement avec accès MCP Figma (`contrib` n'a que l'outil navigateur, voir `contrib.md`).
+
+**Séquence résultante** : `dev` (Init : socle + blocs) → `contrib` (Contribution : composition + écriture de `blocks/<slug>.json`) → `dev` (Theming : lecture de `blocks/<slug>.json`, extraction Figma, écriture de `blocks/<slug>-css.json`, **puis** codage SCSS étape 5). Le mapping CSS se situe donc bien avant l'intégration CSS proprement dite, jamais après.
+
+`contrib` réécrit `blocks/<slug>.json` à chaque fois qu'elle est invoquée sur cette page (composition initiale ou resync en fin de bloc Theming) — mêmes garde-fous que le reste de `contrib.md` (toujours relire l'état réel de l'éditeur avant d'écraser).
+
+---
+
 ## 3. Boucles Contribution et Theming — gestion des itérations
 
 Les deux boucles (`Contrib ↔ Reviewer`, `Theming ↔ Reviewer`) sont gérées par l'Orchestrator :
@@ -174,9 +195,9 @@ Chemin concret dans le repo projet : `agents/journal.ndjson` (voir §9) — seul
 | `sds-bootstrap` | Passation | Copilot (custom agent) | `02-passation-design-dev/agents/sds-bootstrap.md` | `agents/design-manifest/_variables.scss` (livrable préparé, appliqué au thème réel par `init`) |
 | Orchestrator | Développement (transverse) | Copilot (custom agent) | `03-developpement/agents/orchestrator.md` | Journal d'exécution (§8) |
 | `init` | Développement / Init | Copilot (custom agent) | `03-developpement/agents/init.md` | Socle WP instancié, CPT créés |
-| `contrib` | Développement / Contribution | Copilot (custom agent) | `03-developpement/agents/contrib.md` | Composition Gutenberg par page |
+| `contrib` | Développement / Contribution | Copilot (custom agent) | `03-developpement/agents/contrib.md` | Composition Gutenberg par page + `design-manifest/blocks/<slug>.json` (mapping frame↔bloc, §2 ter) |
 | `reviewer` | Développement / Contribution + Theming | Copilot (custom agent) | `03-developpement/agents/reviewer.md` | Verdict classé (§3) |
-| `dev` (theming) | Développement / Theming | Copilot (custom agent) | `03-developpement/agents/dev.md` | SCSS/theming par bloc |
+| `dev` (theming) | Développement / Theming | Copilot (custom agent) | `03-developpement/agents/dev.md` | SCSS/theming par bloc + `design-manifest/blocks/<slug>-css.json` (valeurs CSS extraites, §2 ter) |
 
 **Pourquoi un repo organisé par dossier de phase plutôt qu'un clone/submodule direct comme l'ancien `figma-mcp-claude-skills`** : la découverte de skills Claude Code (`.claude/skills/`) n'est **pas récursive** — un skill placé dans un sous-dossier (ex. `.claude/skills/design/03-inspection/`) ne serait plus détecté du tout, pas juste déplacé. L'ancien repo fonctionnait en submodule/clone direct parce que sa racine était déjà, structurellement, `.claude/skills/` à plat. Ce repo-ci privilégie la lisibilité par phase dans la source (`00-setup/`, `01-design/`, `02-passation-design-dev/`, `03-developpement/`) et délègue l'aplatissement à un **script d'installation** (`scripts/install.ps1`/`.sh`, voir `README.md`).
 
@@ -193,9 +214,12 @@ mon-projet-wp/
 │   ├── design-manifest/       ← livrable write-once de l'agent spec (§2, régénérable en delta cf. §2 bis)
 │   │   ├── index.json / tokens.json / pages/<slug>.json (champ manifest_version) / screenshot/
 │   │   ├── delta-report-<date>.md   ← rapport + plan d'action d'un rejeu en delta (§2 bis)
-│   │   └── assets/            ← dépôt MANUEL par l'humain designer (§2)
-│   │       ├── formes/ icones/ logos/   ← lus par dev (theming)
-│   │       └── pages/<slug>/            ← lus par contrib (photos)
+│   │   ├── assets/            ← dépôt MANUEL par l'humain designer (§2)
+│   │   │   ├── formes/ icones/ logos/   ← lus par dev (theming)
+│   │   │   └── pages/<slug>/            ← lus par contrib (photos)
+│   │   └── blocks/            ← mapping Figma ↔ bloc Gutenberg, deux producteurs distincts (§2 ter)
+│   │       ├── <slug>.json      ← produit par contrib : frame Figma ↔ bloc réel + css_anchor
+│   │       └── <slug>-css.json  ← produit par dev : valeurs CSS exactes extraites de Figma, avant le codage SCSS
 │   └── journal.ndjson         ← journal d'exécution de l'Orchestrator (§8)
 └── wordpress/                 ← sources WordPress classiques, isolées du reste
     ├── wp-content/
